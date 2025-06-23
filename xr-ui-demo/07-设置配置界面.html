@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR星战大联盟 - 设置配置界面</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        #ui-overlay {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #00ffff;
+            font-family: 'Arial', sans-serif;
+            z-index: 1000;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui-overlay">
+        <div>MR星战大联盟 - 设置配置界面</div>
+        <div>3D设置中心 | 个性化配置</div>
+    </div>
+
+    <a-scene 
+        background="color: #000033"
+        vr-mode-ui="enabled: true"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="dotsColor: #00ffff; backgroundColor: #000">
+        
+        <!-- 资源预加载 -->
+        <a-assets>
+            <a-mixin id="setting-panel" 
+                animation__mouseenter="property: scale; to: 1.02 1.02 1.02; startEvents: mouseenter; dur: 200"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200">
+            </a-mixin>
+            <a-mixin id="slider-thumb" 
+                animation__hover="property: scale; to: 1.2 1.2 1.2; startEvents: mouseenter; dur: 150"
+                animation__unhover="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 150">
+            </a-mixin>
+        </a-assets>
+
+        <!-- 环境光照 -->
+        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="directional" position="3 5 4" color="#ffffff" intensity="0.7"></a-light>
+        <a-light type="point" position="0 3 0" color="#00ffff" intensity="1.0"></a-light>
+
+        <!-- 全息投影背景 -->
+        <a-sky color="#000044">
+            <a-animation attribute="rotation" 
+                to="0 360 0" 
+                dur="200000" 
+                repeat="indefinite">
+            </a-animation>
+        </a-sky>
+
+        <!-- 中央设置控制台 -->
+        <a-entity id="settings-console" position="0 1.5 0">
+            <!-- 基座 -->
+            <a-cylinder 
+                radius="1.2" 
+                height="0.1" 
+                color="#001133" 
+                material="emissive: #002266; emissiveIntensity: 0.4; metalness: 0.8">
+                <a-animation attribute="rotation" 
+                    to="0 360 0" 
+                    dur="40000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-cylinder>
+
+            <!-- 设置标题 -->
+            <a-entity id="settings-title" position="0 0.8 0">
+                <a-text 
+                    value="系统设置" 
+                    position="0 0.3 0" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="10">
+                </a-text>
+                <a-text 
+                    value="个性化配置中心" 
+                    position="0 0.1 0" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="6">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 游戏设置面板 (左侧) -->
+        <a-entity id="game-settings" position="-3.5 2 0">
+            <a-text 
+                value="游戏设置" 
+                position="0 1.2 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 游戏设置背景 -->
+            <a-plane 
+                width="3" 
+                height="2.5" 
+                color="#001122" 
+                material="transparent: true; opacity: 0.8"
+                mixin="setting-panel">
+            </a-plane>
+
+            <!-- 难度设置 -->
+            <a-entity id="difficulty-setting" position="0 0.8 0.01">
+                <a-text 
+                    value="游戏难度" 
+                    position="-1.2 0.1 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <!-- 难度选项 -->
+                <a-entity id="difficulty-options" position="0.2 0 0">
+                    <a-plane 
+                        id="easy-btn" 
+                        position="-0.6 0 0" 
+                        width="0.4" 
+                        height="0.15" 
+                        color="#006600" 
+                        class="clickable difficulty-btn"
+                        data-difficulty="easy">
+                    </a-plane>
+                    <a-text 
+                        value="简单" 
+                        position="-0.6 0 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="3">
+                    </a-text>
+                    
+                    <a-plane 
+                        id="normal-btn" 
+                        position="0 0 0" 
+                        width="0.4" 
+                        height="0.15" 
+                        color="#666600" 
+                        class="clickable difficulty-btn selected"
+                        data-difficulty="normal">
+                    </a-plane>
+                    <a-text 
+                        value="普通" 
+                        position="0 0 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="3">
+                    </a-text>
+                    
+                    <a-plane 
+                        id="hard-btn" 
+                        position="0.6 0 0" 
+                        width="0.4" 
+                        height="0.15" 
+                        color="#660000" 
+                        class="clickable difficulty-btn"
+                        data-difficulty="hard">
+                    </a-plane>
+                    <a-text 
+                        value="困难" 
+                        position="0.6 0 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="3">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 音效音量 -->
+            <a-entity id="sound-volume" position="0 0.4 0.01">
+                <a-text 
+                    value="音效音量" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <!-- 音量滑块 -->
+                <a-entity id="sound-slider" position="0.2 0 0">
+                    <a-plane 
+                        width="1.5" 
+                        height="0.05" 
+                        color="#333333">
+                    </a-plane>
+                    <a-sphere 
+                        id="sound-thumb" 
+                        position="0.3 0 0.01" 
+                        radius="0.04" 
+                        color="#00ff00" 
+                        material="emissive: #00ff00; emissiveIntensity: 0.4"
+                        class="clickable slider-thumb"
+                        mixin="slider-thumb">
+                    </a-sphere>
+                    <a-text 
+                        id="sound-value" 
+                        value="70%" 
+                        position="0.9 0 0" 
+                        align="left" 
+                        color="#00ff00" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 背景音乐 -->
+            <a-entity id="music-volume" position="0 0 0.01">
+                <a-text 
+                    value="背景音乐" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="music-slider" position="0.2 0 0">
+                    <a-plane 
+                        width="1.5" 
+                        height="0.05" 
+                        color="#333333">
+                    </a-plane>
+                    <a-sphere 
+                        id="music-thumb" 
+                        position="0.15 0 0.01" 
+                        radius="0.04" 
+                        color="#0066ff" 
+                        material="emissive: #0066ff; emissiveIntensity: 0.4"
+                        class="clickable slider-thumb"
+                        mixin="slider-thumb">
+                    </a-sphere>
+                    <a-text 
+                        id="music-value" 
+                        value="50%" 
+                        position="0.9 0 0" 
+                        align="left" 
+                        color="#0066ff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 自动瞄准 -->
+            <a-entity id="auto-aim" position="0 -0.4 0.01">
+                <a-text 
+                    value="自动瞄准" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="auto-aim-toggle" position="0.5 0 0">
+                    <a-plane 
+                        id="auto-aim-btn" 
+                        width="0.6" 
+                        height="0.2" 
+                        color="#006600" 
+                        class="clickable toggle-btn"
+                        data-enabled="true">
+                    </a-plane>
+                    <a-text 
+                        id="auto-aim-text" 
+                        value="开启" 
+                        position="0 0 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 振动反馈 -->
+            <a-entity id="haptic-feedback" position="0 -0.8 0.01">
+                <a-text 
+                    value="振动反馈" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="haptic-toggle" position="0.5 0 0">
+                    <a-plane 
+                        id="haptic-btn" 
+                        width="0.6" 
+                        height="0.2" 
+                        color="#006600" 
+                        class="clickable toggle-btn"
+                        data-enabled="true">
+                    </a-plane>
+                    <a-text 
+                        id="haptic-text" 
+                        value="开启" 
+                        position="0 0 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+        </a-entity>
+
+        <!-- 显示设置面板 (右侧) -->
+        <a-entity id="display-settings" position="3.5 2 0">
+            <a-text 
+                value="显示设置" 
+                position="0 1.2 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 显示设置背景 -->
+            <a-plane 
+                width="3" 
+                height="2.5" 
+                color="#001122" 
+                material="transparent: true; opacity: 0.8"
+                mixin="setting-panel">
+            </a-plane>
+
+            <!-- 亮度设置 -->
+            <a-entity id="brightness" position="0 0.8 0.01">
+                <a-text 
+                    value="屏幕亮度" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="brightness-slider" position="0.2 0 0">
+                    <a-plane 
+                        width="1.5" 
+                        height="0.05" 
+                        color="#333333">
+                    </a-plane>
+                    <a-sphere 
+                        id="brightness-thumb" 
+                        position="0.45 0 0.01" 
+                        radius="0.04" 
+                        color="#ffaa00" 
+                        material="emissive: #ffaa00; emissiveIntensity: 0.4"
+                        class="clickable slider-thumb"
+                        mixin="slider-thumb">
+                    </a-sphere>
+                    <a-text 
+                        id="brightness-value" 
+                        value="80%" 
+                        position="0.9 0 0" 
+                        align="left" 
+                        color="#ffaa00" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 对比度设置 -->
+            <a-entity id="contrast" position="0 0.4 0.01">
+                <a-text 
+                    value="对比度" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="contrast-slider" position="0.2 0 0">
+                    <a-plane 
+                        width="1.5" 
+                        height="0.05" 
+                        color="#333333">
+                    </a-plane>
+                    <a-sphere 
+                        id="contrast-thumb" 
+                        position="0.3 0 0.01" 
+                        radius="0.04" 
+                        color="#ff6600" 
+                        material="emissive: #ff6600; emissiveIntensity: 0.4"
+                        class="clickable slider-thumb"
+                        mixin="slider-thumb">
+                    </a-sphere>
+                    <a-text 
+                        id="contrast-value" 
+                        value="65%" 
+                        position="0.9 0 0" 
+                        align="left" 
+                        color="#ff6600" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 视野范围 -->
+            <a-entity id="fov" position="0 0 0.01">
+                <a-text 
+                    value="视野范围" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="fov-slider" position="0.2 0 0">
+                    <a-plane 
+                        width="1.5" 
+                        height="0.05" 
+                        color="#333333">
+                    </a-plane>
+                    <a-sphere 
+                        id="fov-thumb" 
+                        position="0.375 0 0.01" 
+                        radius="0.04" 
+                        color="#9900ff" 
+                        material="emissive: #9900ff; emissiveIntensity: 0.4"
+                        class="clickable slider-thumb"
+                        mixin="slider-thumb">
+                    </a-sphere>
+                    <a-text 
+                        id="fov-value" 
+                        value="75°" 
+                        position="0.9 0 0" 
+                        align="left" 
+                        color="#9900ff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- HUD透明度 -->
+            <a-entity id="hud-opacity" position="0 -0.4 0.01">
+                <a-text 
+                    value="HUD透明度" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="hud-slider" position="0.2 0 0">
+                    <a-plane 
+                        width="1.5" 
+                        height="0.05" 
+                        color="#333333">
+                    </a-plane>
+                    <a-sphere 
+                        id="hud-thumb" 
+                        position="0.6 0 0.01" 
+                        radius="0.04" 
+                        color="#00ffff" 
+                        material="emissive: #00ffff; emissiveIntensity: 0.4"
+                        class="clickable slider-thumb"
+                        mixin="slider-thumb">
+                    </a-sphere>
+                    <a-text 
+                        id="hud-value" 
+                        value="90%" 
+                        position="0.9 0 0" 
+                        align="left" 
+                        color="#00ffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 帧率显示 -->
+            <a-entity id="fps-display" position="0 -0.8 0.01">
+                <a-text 
+                    value="帧率显示" 
+                    position="-1.2 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="fps-toggle" position="0.5 0 0">
+                    <a-plane 
+                        id="fps-btn" 
+                        width="0.6" 
+                        height="0.2" 
+                        color="#660000" 
+                        class="clickable toggle-btn"
+                        data-enabled="false">
+                    </a-plane>
+                    <a-text 
+                        id="fps-text" 
+                        value="关闭" 
+                        position="0 0 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+        </a-entity>
+
+        <!-- 控制设置面板 (中下方) -->
+        <a-entity id="control-settings" position="0 0.5 2">
+            <a-text 
+                value="控制设置" 
+                position="0 1 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 控制设置背景 -->
+            <a-plane 
+                width="4" 
+                height="1.5" 
+                color="#001122" 
+                material="transparent: true; opacity: 0.8"
+                mixin="setting-panel">
+            </a-plane>
+
+            <!-- 移动灵敏度 -->
+            <a-entity id="move-sensitivity" position="0 0.4 0.01">
+                <a-text 
+                    value="移动灵敏度" 
+                    position="-1.5 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="move-slider" position="0.3 0 0">
+                    <a-plane 
+                        width="1.5" 
+                        height="0.05" 
+                        color="#333333">
+                    </a-plane>
+                    <a-sphere 
+                        id="move-thumb" 
+                        position="0.225 0 0.01" 
+                        radius="0.04" 
+                        color="#00ff00" 
+                        material="emissive: #00ff00; emissiveIntensity: 0.4"
+                        class="clickable slider-thumb"
+                        mixin="slider-thumb">
+                    </a-sphere>
+                    <a-text 
+                        id="move-value" 
+                        value="60%" 
+                        position="1 0 0" 
+                        align="left" 
+                        color="#00ff00" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 瞄准灵敏度 -->
+            <a-entity id="aim-sensitivity" position="0 0 0.01">
+                <a-text 
+                    value="瞄准灵敏度" 
+                    position="-1.5 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="aim-slider" position="0.3 0 0">
+                    <a-plane 
+                        width="1.5" 
+                        height="0.05" 
+                        color="#333333">
+                    </a-plane>
+                    <a-sphere 
+                        id="aim-thumb" 
+                        position="0.15 0 0.01" 
+                        radius="0.04" 
+                        color="#ff6600" 
+                        material="emissive: #ff6600; emissiveIntensity: 0.4"
+                        class="clickable slider-thumb"
+                        mixin="slider-thumb">
+                    </a-sphere>
+                    <a-text 
+                        id="aim-value" 
+                        value="45%" 
+                        position="1 0 0" 
+                        align="left" 
+                        color="#ff6600" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+
+            <!-- 左手模式 -->
+            <a-entity id="left-handed" position="0 -0.4 0.01">
+                <a-text 
+                    value="左手模式" 
+                    position="-1.5 0 0" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-entity id="left-hand-toggle" position="0.5 0 0">
+                    <a-plane 
+                        id="left-hand-btn" 
+                        width="0.6" 
+                        height="0.2" 
+                        color="#660000" 
+                        class="clickable toggle-btn"
+                        data-enabled="false">
+                    </a-plane>
+                    <a-text 
+                        id="left-hand-text" 
+                        value="关闭" 
+                        position="0 0 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+        </a-entity>
+
+        <!-- 账户设置面板 (底部) -->
+        <a-entity id="account-settings" position="0 -0.5 3">
+            <a-text 
+                value="账户设置" 
+                position="0 0.8 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 账户信息 -->
+            <a-entity id="account-info" position="0 0.3 0">
+                <a-plane 
+                    width="3.5" 
+                    height="0.8" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.8">
+                </a-plane>
+                
+                <!-- 用户头像 -->
+                <a-sphere 
+                    position="-1.4 0 0.01" 
+                    radius="0.15" 
+                    color="#ffffff" 
+                    material="emissive: #ffffff; emissiveIntensity: 0.2">
+                </a-sphere>
+                
+                <!-- 用户信息 -->
+                <a-text 
+                    value="星战指挥官" 
+                    position="-1 0.15 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="等级: 25 | 经验: 8750/10000" 
+                    position="-1 -0.05 0.01" 
+                    align="left" 
+                    color="#ffaa00" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="战绩: 胜率 68% | 击杀 1250" 
+                    position="-1 -0.25 0.01" 
+                    align="left" 
+                    color="#00ff00" 
+                    width="4">
+                </a-text>
+                
+                <!-- 修改资料按钮 -->
+                <a-plane 
+                    position="1.2 0 0.01" 
+                    width="0.8" 
+                    height="0.3" 
+                    color="#006600" 
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="修改资料" 
+                    position="1.2 0 0.02" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 功能按钮区域 -->
+        <a-entity id="function-buttons" position="0 -1.2 3">
+            <!-- 重置设置 -->
+            <a-entity id="reset-btn" position="-2.5 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#cc3300" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="重置设置" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 保存设置 -->
+            <a-entity id="save-btn" position="-0.8 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#006600" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="保存设置" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 应用设置 -->
+            <a-entity id="apply-btn" position="0.8 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#0066cc" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="应用设置" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 返回 -->
+            <a-entity id="back-btn" position="2.5 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#cc6600" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="返回" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 装饰性全息效果 -->
+        <a-entity id="holographic-effects">
+            <!-- 设置环形指示器 -->
+            <a-entity id="setting-rings">
+                <a-torus 
+                    position="0 1 0" 
+                    radius="6" 
+                    radius-tubular="0.01" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.2; transparent: true; opacity: 0.3">
+                    <a-animation attribute="rotation" 
+                        to="0 360 0" 
+                        dur="45000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-torus>
+                <a-torus 
+                    position="0 1 0" 
+                    radius="7" 
+                    radius-tubular="0.005" 
+                    color="#ff6600" 
+                    material="emissive: #ff6600; emissiveIntensity: 0.1; transparent: true; opacity: 0.2">
+                    <a-animation attribute="rotation" 
+                        to="0 -360 0" 
+                        dur="60000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-torus>
+            </a-entity>
+
+            <!-- 数据流效果 -->
+            <a-entity id="data-streams">
+                <a-sphere 
+                    position="5 2 1" 
+                    radius="0.03" 
+                    color="#00ff00" 
+                    material="emissive: #00ff00; emissiveIntensity: 0.8">
+                    <a-animation attribute="position" 
+                        to="5 3 1" 
+                        direction="alternate" 
+                        dur="2500" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                <a-sphere 
+                    position="-5 1 -1" 
+                    radius="0.03" 
+                    color="#ff6600" 
+                    material="emissive: #ff6600; emissiveIntensity: 0.8">
+                    <a-animation attribute="position" 
+                        to="-5 2 -1" 
+                        direction="alternate" 
+                        dur="3500" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+            </a-entity>
+        </a-entity>
+
+        <!-- 用户摄像头和控制器 -->
+        <a-entity id="rig" position="0 1.6 0">
+            <a-camera 
+                look-controls="pointerLockEnabled: true"
+                wasd-controls="enabled: false">
+                <!-- 准星 -->
+                <a-ring 
+                    position="0 0 -0.5" 
+                    radius-inner="0.005" 
+                    radius-outer="0.01" 
+                    color="#00ffff" 
+                    material="transparent: true; opacity: 0.6">
+                </a-ring>
+            </a-camera>
+            
+            <!-- 左手控制器 -->
+            <a-entity 
+                id="left-hand" 
+                hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+            
+            <!-- 右手控制器 -->
+            <a-entity 
+                id="right-hand" 
+                hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+        </a-entity>
+
+        <!-- 交互脚本 -->
+        <script>
+            // 设置数据
+            const settingsData = {
+                game: {
+                    difficulty: 'normal',
+                    soundVolume: 70,
+                    musicVolume: 50,
+                    autoAim: true,
+                    hapticFeedback: true
+                },
+                display: {
+                    brightness: 80,
+                    contrast: 65,
+                    fov: 75,
+                    hudOpacity: 90,
+                    fpsDisplay: false
+                },
+                control: {
+                    moveSensitivity: 60,
+                    aimSensitivity: 45,
+                    leftHanded: false
+                }
+            };
+
+            // 难度选择按钮
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 移除所有选中状态
+                    document.querySelectorAll('.difficulty-btn').forEach(b => {
+                        b.classList.remove('selected');
+                        b.setAttribute('color', b.dataset.difficulty === 'easy' ? '#006600' : 
+                                                b.dataset.difficulty === 'normal' ? '#666600' : '#660000');
+                    });
+                    
+                    // 设置当前选中
+                    this.classList.add('selected');
+                    this.setAttribute('color', '#ffaa00');
+                    settingsData.game.difficulty = this.dataset.difficulty;
+                    console.log('难度设置为:', settingsData.game.difficulty);
+                });
+            });
+
+            // 滑块控制
+            const sliders = {
+                'sound-thumb': { min: 0, max: 100, current: 70, valueId: 'sound-value', suffix: '%', setting: 'game.soundVolume' },
+                'music-thumb': { min: 0, max: 100, current: 50, valueId: 'music-value', suffix: '%', setting: 'game.musicVolume' },
+                'brightness-thumb': { min: 0, max: 100, current: 80, valueId: 'brightness-value', suffix: '%', setting: 'display.brightness' },
+                'contrast-thumb': { min: 0, max: 100, current: 65, valueId: 'contrast-value', suffix: '%', setting: 'display.contrast' },
+                'fov-thumb': { min: 60, max: 90, current: 75, valueId: 'fov-value', suffix: '°', setting: 'display.fov' },
+                'hud-thumb': { min: 0, max: 100, current: 90, valueId: 'hud-value', suffix: '%', setting: 'display.hudOpacity' },
+                'move-thumb': { min: 0, max: 100, current: 60, valueId: 'move-value', suffix: '%', setting: 'control.moveSensitivity' },
+                'aim-thumb': { min: 0, max: 100, current: 45, valueId: 'aim-value', suffix: '%', setting: 'control.aimSensitivity' }
+            };
+
+            Object.keys(sliders).forEach(sliderId => {
+                const slider = sliders[sliderId];
+                const thumb = document.getElementById(sliderId);
+                const valueDisplay = document.getElementById(slider.valueId);
+                
+                thumb.addEventListener('click', function() {
+                    // 简化的滑块交互 - 实际应用中需要更复杂的拖拽逻辑
+                    slider.current = Math.min(slider.max, slider.current + 10);
+                    if (slider.current > slider.max) slider.current = slider.min;
+                    
+                    // 更新显示
+                    valueDisplay.setAttribute('value', slider.current + slider.suffix);
+                    
+                    // 更新设置数据
+                    const [category, setting] = slider.setting.split('.');
+                    settingsData[category][setting] = slider.current;
+                    
+                    console.log(`${slider.setting} 设置为:`, slider.current);
+                });
+            });
+
+            // 开关按钮
+            const toggleButtons = {
+                'auto-aim-btn': { setting: 'game.autoAim', textId: 'auto-aim-text' },
+                'haptic-btn': { setting: 'game.hapticFeedback', textId: 'haptic-text' },
+                'fps-btn': { setting: 'display.fpsDisplay', textId: 'fps-text' },
+                'left-hand-btn': { setting: 'control.leftHanded', textId: 'left-hand-text' }
+            };
+
+            Object.keys(toggleButtons).forEach(btnId => {
+                const toggle = toggleButtons[btnId];
+                const btn = document.getElementById(btnId);
+                const text = document.getElementById(toggle.textId);
+                
+                btn.addEventListener('click', function() {
+                    const currentState = this.dataset.enabled === 'true';
+                    const newState = !currentState;
+                    
+                    this.dataset.enabled = newState;
+                    this.setAttribute('color', newState ? '#006600' : '#660000');
+                    text.setAttribute('value', newState ? '开启' : '关闭');
+                    
+                    // 更新设置数据
+                    const [category, setting] = toggle.setting.split('.');
+                    settingsData[category][setting] = newState;
+                    
+                    console.log(`${toggle.setting} 设置为:`, newState);
+                });
+            });
+
+            // 功能按钮
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                console.log('重置所有设置');
+                // 重置所有设置到默认值
+                resetAllSettings();
+            });
+
+            document.getElementById('save-btn').addEventListener('click', function() {
+                console.log('保存设置');
+                // 保存设置到本地存储
+                localStorage.setItem('mrStarWarSettings', JSON.stringify(settingsData));
+            });
+
+            document.getElementById('apply-btn').addEventListener('click', function() {
+                console.log('应用设置');
+                // 应用当前设置
+                applySettings();
+            });
+
+            document.getElementById('back-btn').addEventListener('click', function() {
+                console.log('返回主菜单');
+                // 返回主菜单
+            });
+
+            // 修改资料按钮
+            document.querySelector('#account-info .clickable').addEventListener('click', function() {
+                console.log('修改用户资料');
+                // 打开用户资料编辑界面
+            });
+
+            // 重置所有设置
+            function resetAllSettings() {
+                // 重置游戏设置
+                settingsData.game = {
+                    difficulty: 'normal',
+                    soundVolume: 70,
+                    musicVolume: 50,
+                    autoAim: true,
+                    hapticFeedback: true
+                };
+                
+                // 重置显示设置
+                settingsData.display = {
+                    brightness: 80,
+                    contrast: 65,
+                    fov: 75,
+                    hudOpacity: 90,
+                    fpsDisplay: false
+                };
+                
+                // 重置控制设置
+                settingsData.control = {
+                    moveSensitivity: 60,
+                    aimSensitivity: 45,
+                    leftHanded: false
+                };
+                
+                // 更新UI显示
+                updateAllUI();
+                console.log('所有设置已重置为默认值');
+            }
+
+            // 应用设置
+            function applySettings() {
+                console.log('应用设置:', settingsData);
+                // 这里可以调用实际的设置应用逻辑
+                // 例如：调整音量、改变显示参数等
+            }
+
+            // 更新所有UI显示
+            function updateAllUI() {
+                // 更新滑块位置和数值
+                Object.keys(sliders).forEach(sliderId => {
+                    const slider = sliders[sliderId];
+                    const [category, setting] = slider.setting.split('.');
+                    const value = settingsData[category][setting];
+                    
+                    slider.current = value;
+                    document.getElementById(slider.valueId).setAttribute('value', value + slider.suffix);
+                });
+                
+                // 更新开关按钮
+                Object.keys(toggleButtons).forEach(btnId => {
+                    const toggle = toggleButtons[btnId];
+                    const [category, setting] = toggle.setting.split('.');
+                    const value = settingsData[category][setting];
+                    
+                    const btn = document.getElementById(btnId);
+                    const text = document.getElementById(toggle.textId);
+                    
+                    btn.dataset.enabled = value;
+                    btn.setAttribute('color', value ? '#006600' : '#660000');
+                    text.setAttribute('value', value ? '开启' : '关闭');
+                });
+                
+                // 更新难度选择
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                    btn.setAttribute('color', btn.dataset.difficulty === 'easy' ? '#006600' : 
+                                            btn.dataset.difficulty === 'normal' ? '#666600' : '#660000');
+                    
+                    if (btn.dataset.difficulty === settingsData.game.difficulty) {
+                        btn.classList.add('selected');
+                        btn.setAttribute('color', '#ffaa00');
+                    }
+                });
+            }
+
+            // 加载保存的设置
+            function loadSettings() {
+                const saved = localStorage.getItem('mrStarWarSettings');
+                if (saved) {
+                    Object.assign(settingsData, JSON.parse(saved));
+                    updateAllUI();
+                    console.log('已加载保存的设置');
+                }
+            }
+
+            // 初始化
+            loadSettings();
+        </script>
+    </a-scene>
+</body>
+</html>

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR星战大联盟 - 武器装备界面</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        #ui-overlay {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #00ffff;
+            font-family: 'Arial', sans-serif;
+            z-index: 1000;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui-overlay">
+        <div>MR星战大联盟 - 武器装备界面</div>
+        <div>3D武器展示 | 立体装备配置</div>
+    </div>
+
+    <a-scene 
+        background="color: #0a0a0a"
+        vr-mode-ui="enabled: true"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="dotsColor: #00ffff; backgroundColor: #000">
+        
+        <!-- 资源预加载 -->
+        <a-assets>
+            <a-mixin id="weapon-slot" 
+                animation__mouseenter="property: scale; to: 1.1 1.1 1.1; startEvents: mouseenter; dur: 200"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200">
+            </a-mixin>
+            <a-mixin id="hologram-material" 
+                material="shader: standard; transparent: true; opacity: 0.8; emissive: #003366; emissiveIntensity: 0.3">
+            </a-mixin>
+        </a-assets>
+
+        <!-- 环境光照 -->
+        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="directional" position="3 5 4" color="#ffffff" intensity="0.7"></a-light>
+        <a-light type="point" position="0 2 0" color="#00ffff" intensity="1.0"></a-light>
+        <a-light type="point" position="-2 1 2" color="#ff6600" intensity="0.5"></a-light>
+
+        <!-- 全息投影背景 -->
+        <a-sky color="#000033">
+            <a-animation attribute="rotation" 
+                to="0 360 0" 
+                dur="200000" 
+                repeat="indefinite">
+            </a-animation>
+        </a-sky>
+
+        <!-- 中央武器展示台 -->
+        <a-entity id="weapon-display" position="0 1.5 -1">
+            <!-- 展示台基座 -->
+            <a-cylinder 
+                radius="0.6" 
+                height="0.05" 
+                color="#002244" 
+                material="emissive: #004488; emissiveIntensity: 0.5; metalness: 0.9">
+                <a-animation attribute="rotation" 
+                    to="0 360 0" 
+                    dur="30000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-cylinder>
+
+            <!-- 当前选中武器 (突击步枪) -->
+            <a-entity id="current-weapon" position="0 0.5 0">
+                <!-- 武器主体 -->
+                <a-box 
+                    width="0.8" 
+                    height="0.15" 
+                    depth="0.1" 
+                    color="#333333" 
+                    material="metalness: 0.8; roughness: 0.2; emissive: #001122; emissiveIntensity: 0.2">
+                </a-box>
+                <!-- 枪管 -->
+                <a-cylinder 
+                    position="0.5 0 0" 
+                    radius="0.03" 
+                    height="0.4" 
+                    rotation="0 0 90" 
+                    color="#444444" 
+                    material="metalness: 0.9; roughness: 0.1">
+                </a-cylinder>
+                <!-- 瞄准镜 -->
+                <a-box 
+                    position="-0.1 0.1 0" 
+                    width="0.2" 
+                    height="0.08" 
+                    depth="0.08" 
+                    color="#222222" 
+                    material="metalness: 0.7; roughness: 0.3">
+                </a-box>
+                <!-- 全息效果 -->
+                <a-torus 
+                    position="0 0 0" 
+                    radius="0.5" 
+                    radius-tubular="0.01" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.6; transparent: true; opacity: 0.4">
+                    <a-animation attribute="rotation" 
+                        to="0 360 0" 
+                        dur="8000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-torus>
+            </a-entity>
+
+            <!-- 武器信息面板 -->
+            <a-entity id="weapon-info" position="0 1.2 0">
+                <a-plane 
+                    width="2.5" 
+                    height="0.8" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.8; emissive: #002244; emissiveIntensity: 0.3">
+                </a-plane>
+                <a-text 
+                    value="AK-47 突击步枪" 
+                    position="0 0.25 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="伤害: 45  射程: 80  精度: 75  射速: 85" 
+                    position="0 0.05 0.01" 
+                    align="center" 
+                    color="#ffaa00" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="弹夹: 30发  重量: 4.3kg  解锁等级: 5" 
+                    position="0 -0.15 0.01" 
+                    align="center" 
+                    color="#00ff00" 
+                    width="4">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 武器分类选择 -->
+        <a-entity id="weapon-categories" position="-3 2 0">
+            <!-- 突击步枪 -->
+            <a-entity id="assault-rifles" position="0 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#ff6600" 
+                    material="transparent: true; opacity: 0.9; emissive: #ff3300; emissiveIntensity: 0.3"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="突击步枪" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 狙击步枪 -->
+            <a-entity id="sniper-rifles" position="0 -0.6 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#0066cc" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="狙击步枪" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 冲锋枪 -->
+            <a-entity id="submachine-guns" position="0 -1.2 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#cc6600" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="冲锋枪" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 霰弹枪 -->
+            <a-entity id="shotguns" position="0 -1.8 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#cc0066" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="霰弹枪" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 武器列表 -->
+        <a-entity id="weapon-list" position="3 2 0">
+            <!-- 武器1 -->
+            <a-entity id="weapon-1" position="0 0 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#004400" 
+                    material="transparent: true; opacity: 0.8"
+                    class="clickable weapon-item">
+                </a-plane>
+                <a-text 
+                    value="AK-47" 
+                    position="-0.7 0 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="已装备" 
+                    position="0.7 0 0.01" 
+                    align="right" 
+                    color="#00ff00" 
+                    width="3">
+                </a-text>
+            </a-entity>
+
+            <!-- 武器2 -->
+            <a-entity id="weapon-2" position="0 -0.4 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#444400" 
+                    material="transparent: true; opacity: 0.8"
+                    class="clickable weapon-item">
+                </a-plane>
+                <a-text 
+                    value="M4A1" 
+                    position="-0.7 0 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="可装备" 
+                    position="0.7 0 0.01" 
+                    align="right" 
+                    color="#ffaa00" 
+                    width="3">
+                </a-text>
+            </a-entity>
+
+            <!-- 武器3 -->
+            <a-entity id="weapon-3" position="0 -0.8 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#440044" 
+                    material="transparent: true; opacity: 0.8"
+                    class="clickable weapon-item">
+                </a-plane>
+                <a-text 
+                    value="SCAR-L" 
+                    position="-0.7 0 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="可装备" 
+                    position="0.7 0 0.01" 
+                    align="right" 
+                    color="#ffaa00" 
+                    width="3">
+                </a-text>
+            </a-entity>
+
+            <!-- 武器4 -->
+            <a-entity id="weapon-4" position="0 -1.2 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#440000" 
+                    material="transparent: true; opacity: 0.5"
+                    class="clickable weapon-item">
+                </a-plane>
+                <a-text 
+                    value="AWM" 
+                    position="-0.7 0 0.01" 
+                    align="left" 
+                    color="#888888" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="未解锁" 
+                    position="0.7 0 0.01" 
+                    align="right" 
+                    color="#ff0000" 
+                    width="3">
+                </a-text>
+            </a-entity>
+
+            <!-- 武器5 -->
+            <a-entity id="weapon-5" position="0 -1.6 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#440000" 
+                    material="transparent: true; opacity: 0.5"
+                    class="clickable weapon-item">
+                </a-plane>
+                <a-text 
+                    value="Barrett M82" 
+                    position="-0.7 0 0.01" 
+                    align="left" 
+                    color="#888888" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="未解锁" 
+                    position="0.7 0 0.01" 
+                    align="right" 
+                    color="#ff0000" 
+                    width="3">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 配件系统 -->
+        <a-entity id="attachments" position="0 0.5 1">
+            <a-text 
+                value="武器配件" 
+                position="0 0.8 0" 
+                align="center" 
+                color="#ffffff" 
+                width="6">
+            </a-text>
+
+            <!-- 瞄准镜 -->
+            <a-entity id="scope-slot" position="-1 0.3 0">
+                <a-plane 
+                    width="0.8" 
+                    height="0.3" 
+                    color="#003366" 
+                    material="transparent: true; opacity: 0.8"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="瞄准镜" 
+                    position="0 0.1 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="3">
+                </a-text>
+                <a-text 
+                    value="红点镜" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#00ff00" 
+                    width="2.5">
+                </a-text>
+            </a-entity>
+
+            <!-- 枪口 -->
+            <a-entity id="muzzle-slot" position="0 0.3 0">
+                <a-plane 
+                    width="0.8" 
+                    height="0.3" 
+                    color="#663300" 
+                    material="transparent: true; opacity: 0.8"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="枪口" 
+                    position="0 0.1 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="3">
+                </a-text>
+                <a-text 
+                    value="消音器" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#00ff00" 
+                    width="2.5">
+                </a-text>
+            </a-entity>
+
+            <!-- 握把 -->
+            <a-entity id="grip-slot" position="1 0.3 0">
+                <a-plane 
+                    width="0.8" 
+                    height="0.3" 
+                    color="#330066" 
+                    material="transparent: true; opacity: 0.8"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="握把" 
+                    position="0 0.1 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="3">
+                </a-text>
+                <a-text 
+                    value="垂直握把" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#00ff00" 
+                    width="2.5">
+                </a-text>
+            </a-entity>
+
+            <!-- 弹夹 -->
+            <a-entity id="magazine-slot" position="-0.5 -0.2 0">
+                <a-plane 
+                    width="0.8" 
+                    height="0.3" 
+                    color="#006633" 
+                    material="transparent: true; opacity: 0.8"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="弹夹" 
+                    position="0 0.1 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="3">
+                </a-text>
+                <a-text 
+                    value="扩容弹夹" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#00ff00" 
+                    width="2.5">
+                </a-text>
+            </a-entity>
+
+            <!-- 枪托 -->
+            <a-entity id="stock-slot" position="0.5 -0.2 0">
+                <a-plane 
+                    width="0.8" 
+                    height="0.3" 
+                    color="#663366" 
+                    material="transparent: true; opacity: 0.8"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="枪托" 
+                    position="0 0.1 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="3">
+                </a-text>
+                <a-text 
+                    value="战术枪托" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#00ff00" 
+                    width="2.5">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 控制按钮 -->
+        <a-entity id="control-buttons" position="0 0.2 2">
+            <!-- 装备武器 -->
+            <a-entity id="equip-btn" position="-1 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#00aa00" 
+                    material="transparent: true; opacity: 0.9; emissive: #006600; emissiveIntensity: 0.3"
+                    class="clickable">
+                    <a-animation attribute="scale" 
+                        to="1.05 1.05 1.05" 
+                        direction="alternate" 
+                        dur="2000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-plane>
+                <a-text 
+                    value="装备武器" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 返回 -->
+            <a-entity id="back-btn" position="1 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#cc6600" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="返回" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 装饰性全息效果 -->
+        <a-entity id="holographic-effects">
+            <!-- 数据网格 -->
+            <a-entity id="data-grid">
+                <a-plane 
+                    position="0 0 -3" 
+                    width="10" 
+                    height="6" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.1; wireframe: true">
+                </a-plane>
+            </a-entity>
+
+            <!-- 浮动粒子 -->
+            <a-entity id="floating-particles">
+                <a-sphere 
+                    position="2 3 1" 
+                    radius="0.02" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.8">
+                    <a-animation attribute="position" 
+                        to="2 1 1" 
+                        direction="alternate" 
+                        dur="4000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                <a-sphere 
+                    position="-2 2 -1" 
+                    radius="0.02" 
+                    color="#ff6600" 
+                    material="emissive: #ff6600; emissiveIntensity: 0.8">
+                    <a-animation attribute="position" 
+                        to="-2 3 -1" 
+                        direction="alternate" 
+                        dur="3500" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+            </a-entity>
+        </a-entity>
+
+        <!-- 用户摄像头和控制器 -->
+        <a-entity id="rig" position="0 1.6 0">
+            <a-camera 
+                look-controls="pointerLockEnabled: true"
+                wasd-controls="enabled: false">
+                <!-- 准星 -->
+                <a-ring 
+                    position="0 0 -0.5" 
+                    radius-inner="0.005" 
+                    radius-outer="0.01" 
+                    color="#00ffff" 
+                    material="transparent: true; opacity: 0.6">
+                </a-ring>
+            </a-camera>
+            
+            <!-- 左手控制器 -->
+            <a-entity 
+                id="left-hand" 
+                hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+            
+            <!-- 右手控制器 -->
+            <a-entity 
+                id="right-hand" 
+                hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+        </a-entity>
+
+        <!-- 交互脚本 -->
+        <script>
+            // 武器数据
+            const weaponData = {
+                'assault-rifles': [
+                    { name: 'AK-47', damage: 45, range: 80, accuracy: 75, fireRate: 85, equipped: true },
+                    { name: 'M4A1', damage: 42, range: 85, accuracy: 80, fireRate: 90, equipped: false },
+                    { name: 'SCAR-L', damage: 44, range: 82, accuracy: 78, fireRate: 88, equipped: false }
+                ],
+                'sniper-rifles': [
+                    { name: 'AWM', damage: 95, range: 100, accuracy: 95, fireRate: 20, unlocked: false },
+                    { name: 'Barrett M82', damage: 100, range: 100, accuracy: 90, fireRate: 15, unlocked: false }
+                ]
+            };
+
+            let currentCategory = 'assault-rifles';
+            let selectedWeapon = weaponData[currentCategory][0];
+
+            // 武器分类点击事件
+            document.querySelector('#assault-rifles').addEventListener('click', function() {
+                currentCategory = 'assault-rifles';
+                updateWeaponList();
+                console.log('切换到突击步枪分类');
+            });
+
+            document.querySelector('#sniper-rifles').addEventListener('click', function() {
+                currentCategory = 'sniper-rifles';
+                updateWeaponList();
+                console.log('切换到狙击步枪分类');
+            });
+
+            // 武器选择事件
+            document.querySelectorAll('.weapon-item').forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    if (weaponData[currentCategory][index]) {
+                        selectedWeapon = weaponData[currentCategory][index];
+                        updateWeaponDisplay();
+                        console.log('选择武器:', selectedWeapon.name);
+                    }
+                });
+            });
+
+            // 装备按钮事件
+            document.querySelector('#equip-btn').addEventListener('click', function() {
+                console.log('装备武器:', selectedWeapon.name);
+                // 装备选中的武器
+            });
+
+            // 返回按钮事件
+            document.querySelector('#back-btn').addEventListener('click', function() {
+                console.log('返回上一界面');
+                // 返回房间大厅或主菜单
+            });
+
+            // 配件点击事件
+            document.querySelectorAll('#attachments .clickable').forEach(attachment => {
+                attachment.addEventListener('click', function() {
+                    console.log('配件被点击:', attachment.id);
+                    // 打开配件选择界面
+                });
+            });
+
+            // 更新武器列表显示
+            function updateWeaponList() {
+                // 这里可以动态更新武器列表
+            }
+
+            // 更新武器展示
+            function updateWeaponDisplay() {
+                const infoPanel = document.querySelector('#weapon-info');
+                // 更新武器信息显示
+            }
+
+            // 初始化
+            updateWeaponDisplay();
+        </script>
+    </a-scene>
+</body>
+</html>

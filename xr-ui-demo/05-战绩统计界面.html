@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR星战大联盟 - 战绩统计界面</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        #ui-overlay {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #00ffff;
+            font-family: 'Arial', sans-serif;
+            z-index: 1000;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui-overlay">
+        <div>MR星战大联盟 - 战绩统计界面</div>
+        <div>3D数据可视化 | 全方位战绩分析</div>
+    </div>
+
+    <a-scene 
+        background="color: #000011"
+        vr-mode-ui="enabled: true"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="dotsColor: #00ffff; backgroundColor: #000">
+        
+        <!-- 资源预加载 -->
+        <a-assets>
+            <a-mixin id="stats-panel" 
+                animation__mouseenter="property: scale; to: 1.05 1.05 1.05; startEvents: mouseenter; dur: 200"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200">
+            </a-mixin>
+            <a-mixin id="hologram-material" 
+                material="shader: standard; transparent: true; opacity: 0.8; emissive: #003366; emissiveIntensity: 0.3">
+            </a-mixin>
+        </a-assets>
+
+        <!-- 环境光照 -->
+        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="directional" position="3 5 4" color="#ffffff" intensity="0.7"></a-light>
+        <a-light type="point" position="0 3 0" color="#00ffff" intensity="1.2"></a-light>
+
+        <!-- 全息投影背景 -->
+        <a-sky color="#000022">
+            <a-animation attribute="rotation" 
+                to="0 360 0" 
+                dur="240000" 
+                repeat="indefinite">
+            </a-animation>
+        </a-sky>
+
+        <!-- 中央统计展示台 -->
+        <a-entity id="stats-center" position="0 1.5 0">
+            <!-- 基座 -->
+            <a-cylinder 
+                radius="1.2" 
+                height="0.1" 
+                color="#001133" 
+                material="emissive: #002266; emissiveIntensity: 0.4; metalness: 0.8">
+                <a-animation attribute="rotation" 
+                    to="0 360 0" 
+                    dur="40000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-cylinder>
+
+            <!-- 玩家头像和基本信息 -->
+            <a-entity id="player-info" position="0 0.8 0">
+                <!-- 头像 -->
+                <a-sphere 
+                    radius="0.3" 
+                    color="#ffffff" 
+                    material="emissive: #ffffff; emissiveIntensity: 0.2">
+                    <a-animation attribute="rotation" 
+                        to="0 360 0" 
+                        dur="10000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                
+                <!-- 玩家名称 -->
+                <a-text 
+                    value="星战指挥官" 
+                    position="0 0.5 0" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="8">
+                </a-text>
+                
+                <!-- 等级信息 -->
+                <a-text 
+                    value="等级: 25" 
+                    position="0 0.35 0" 
+                    align="center" 
+                    color="#ffaa00" 
+                    width="6">
+                </a-text>
+                
+                <!-- 经验条 -->
+                <a-plane 
+                    position="0 0.2 0" 
+                    width="1.5" 
+                    height="0.08" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.8">
+                </a-plane>
+                <a-plane 
+                    position="-0.15 0.2 0.001" 
+                    width="1.2" 
+                    height="0.05" 
+                    color="#00ff00" 
+                    material="emissive: #00ff00; emissiveIntensity: 0.4">
+                </a-plane>
+                <a-text 
+                    value="经验: 8750/10000" 
+                    position="0 0.1 0" 
+                    align="center" 
+                    color="#00ff00" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 3D数据可视化图表 -->
+            <a-entity id="stats-chart" position="0 0.2 0">
+                <!-- KDA比率柱状图 -->
+                <a-entity id="kda-chart" position="-0.6 0 0">
+                    <!-- 击杀柱 -->
+                    <a-box 
+                        width="0.15" 
+                        height="0.8" 
+                        depth="0.15" 
+                        color="#00ff00" 
+                        material="emissive: #00ff00; emissiveIntensity: 0.3">
+                    </a-box>
+                    <a-text 
+                        value="击杀" 
+                        position="0 -0.5 0" 
+                        align="center" 
+                        color="#00ff00" 
+                        width="4">
+                    </a-text>
+                    <a-text 
+                        value="1247" 
+                        position="0 -0.6 0" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+
+                <a-entity id="death-chart" position="-0.2 0 0">
+                    <!-- 死亡柱 -->
+                    <a-box 
+                        width="0.15" 
+                        height="0.4" 
+                        depth="0.15" 
+                        color="#ff0000" 
+                        material="emissive: #ff0000; emissiveIntensity: 0.3">
+                    </a-box>
+                    <a-text 
+                        value="死亡" 
+                        position="0 -0.5 0" 
+                        align="center" 
+                        color="#ff0000" 
+                        width="4">
+                    </a-text>
+                    <a-text 
+                        value="623" 
+                        position="0 -0.6 0" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+
+                <a-entity id="assist-chart" position="0.2 0 0">
+                    <!-- 助攻柱 -->
+                    <a-box 
+                        width="0.15" 
+                        height="0.6" 
+                        depth="0.15" 
+                        color="#0066ff" 
+                        material="emissive: #0066ff; emissiveIntensity: 0.3">
+                    </a-box>
+                    <a-text 
+                        value="助攻" 
+                        position="0 -0.5 0" 
+                        align="center" 
+                        color="#0066ff" 
+                        width="4">
+                    </a-text>
+                    <a-text 
+                        value="934" 
+                        position="0 -0.6 0" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+
+                <!-- KDA比率显示 -->
+                <a-text 
+                    value="KDA: 3.5" 
+                    position="0.6 0.3 0" 
+                    align="center" 
+                    color="#ffff00" 
+                    width="6">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 详细统计面板 (左侧) -->
+        <a-entity id="detailed-stats" position="-3 2 0">
+            <a-text 
+                value="详细统计" 
+                position="0 0.8 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 游戏场次 -->
+            <a-entity id="games-played" position="0 0.5 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#001122" 
+                    mixin="stats-panel"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="总场次: 156" 
+                    position="-0.7 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="胜率: 68%" 
+                    position="0.7 0.05 0.01" 
+                    align="right" 
+                    color="#00ff00" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="胜: 106  负: 50" 
+                    position="0 -0.08 0.01" 
+                    align="center" 
+                    color="#ffaa00" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 平均数据 -->
+            <a-entity id="average-stats" position="0 0.1 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#112200" 
+                    mixin="stats-panel"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="场均击杀: 8.0" 
+                    position="-0.7 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="场均死亡: 4.0" 
+                    position="0.7 0.05 0.01" 
+                    align="right" 
+                    color="#ff6600" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="场均助攻: 6.0" 
+                    position="0 -0.08 0.01" 
+                    align="center" 
+                    color="#0066ff" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 最佳表现 -->
+            <a-entity id="best-performance" position="0 -0.3 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#220011" 
+                    mixin="stats-panel"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="单场最高击杀: 25" 
+                    position="0 0.05 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="最长连杀: 15" 
+                    position="0 -0.08 0.01" 
+                    align="center" 
+                    color="#ffff00" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 武器统计 -->
+            <a-entity id="weapon-stats" position="0 -0.7 0">
+                <a-plane 
+                    width="2" 
+                    height="0.3" 
+                    color="#001122" 
+                    mixin="stats-panel"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="最爱武器: AK-47" 
+                    position="0 0.05 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="命中率: 72%" 
+                    position="0 -0.08 0.01" 
+                    align="center" 
+                    color="#00ff00" 
+                    width="4">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 排行榜 (右侧) -->
+        <a-entity id="leaderboard" position="3 2 0">
+            <a-text 
+                value="全球排行榜" 
+                position="0 0.8 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 排名1 -->
+            <a-entity id="rank-1" position="0 0.5 0">
+                <a-plane 
+                    width="2.5" 
+                    height="0.25" 
+                    color="#ffaa00" 
+                    material="emissive: #ffaa00; emissiveIntensity: 0.2; transparent: true; opacity: 0.8"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="1. 星战传奇" 
+                    position="-1 0.05 0.01" 
+                    align="left" 
+                    color="#000000" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="得分: 15420" 
+                    position="1 0.05 0.01" 
+                    align="right" 
+                    color="#000000" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="KDA: 4.2" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#000000" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 排名2 -->
+            <a-entity id="rank-2" position="0 0.2 0">
+                <a-plane 
+                    width="2.5" 
+                    height="0.25" 
+                    color="#cccccc" 
+                    material="emissive: #cccccc; emissiveIntensity: 0.2; transparent: true; opacity: 0.8"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="2. 银河战士" 
+                    position="-1 0.05 0.01" 
+                    align="left" 
+                    color="#000000" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="得分: 14890" 
+                    position="1 0.05 0.01" 
+                    align="right" 
+                    color="#000000" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="KDA: 3.9" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#000000" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 排名3 -->
+            <a-entity id="rank-3" position="0 -0.1 0">
+                <a-plane 
+                    width="2.5" 
+                    height="0.25" 
+                    color="#cd7f32" 
+                    material="emissive: #cd7f32; emissiveIntensity: 0.2; transparent: true; opacity: 0.8"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="3. 宇宙猎手" 
+                    position="-1 0.05 0.01" 
+                    align="left" 
+                    color="#000000" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="得分: 13650" 
+                    position="1 0.05 0.01" 
+                    align="right" 
+                    color="#000000" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="KDA: 3.7" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#000000" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 我的排名 -->
+            <a-entity id="my-rank" position="0 -0.5 0">
+                <a-plane 
+                    width="2.5" 
+                    height="0.25" 
+                    color="#0066cc" 
+                    material="emissive: #0066cc; emissiveIntensity: 0.3; transparent: true; opacity: 0.9"
+                    class="clickable">
+                    <a-animation attribute="material.emissiveIntensity" 
+                        to="0.6" 
+                        direction="alternate" 
+                        dur="2000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-plane>
+                <a-text 
+                    value="15. 星战指挥官 (你)" 
+                    position="-1 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="得分: 9850" 
+                    position="1 0.05 0.01" 
+                    align="right" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="KDA: 3.5" 
+                    position="0 -0.05 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="4">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 成就系统 -->
+        <a-entity id="achievements" position="0 0.5 2">
+            <a-text 
+                value="成就徽章" 
+                position="0 0.8 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 成就1 -->
+            <a-entity id="achievement-1" position="-1 0.3 0">
+                <a-sphere 
+                    radius="0.15" 
+                    color="#ffaa00" 
+                    material="emissive: #ffaa00; emissiveIntensity: 0.4; metalness: 0.8"
+                    class="clickable">
+                    <a-animation attribute="rotation" 
+                        to="0 360 0" 
+                        dur="8000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                <a-text 
+                    value="百发百中" 
+                    position="0 -0.3 0" 
+                    align="center" 
+                    color="#ffaa00" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 成就2 -->
+            <a-entity id="achievement-2" position="0 0.3 0">
+                <a-sphere 
+                    radius="0.15" 
+                    color="#ff0066" 
+                    material="emissive: #ff0066; emissiveIntensity: 0.4; metalness: 0.8"
+                    class="clickable">
+                    <a-animation attribute="rotation" 
+                        to="0 360 0" 
+                        dur="6000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                <a-text 
+                    value="连杀狂魔" 
+                    position="0 -0.3 0" 
+                    align="center" 
+                    color="#ff0066" 
+                    width="4">
+                </a-text>
+            </a-entity>
+
+            <!-- 成就3 -->
+            <a-entity id="achievement-3" position="1 0.3 0">
+                <a-sphere 
+                    radius="0.15" 
+                    color="#00ff66" 
+                    material="emissive: #00ff66; emissiveIntensity: 0.4; metalness: 0.8"
+                    class="clickable">
+                    <a-animation attribute="rotation" 
+                        to="0 360 0" 
+                        dur="10000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                <a-text 
+                    value="团队合作" 
+                    position="0 -0.3 0" 
+                    align="center" 
+                    color="#00ff66" 
+                    width="4">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 控制按钮 -->
+        <a-entity id="control-buttons" position="0 0.2 3">
+            <!-- 分享战绩 -->
+            <a-entity id="share-btn" position="-1.5 0 0">
+                <a-plane 
+                    width="1.2" 
+                    height="0.4" 
+                    color="#00aa00" 
+                    material="transparent: true; opacity: 0.9; emissive: #006600; emissiveIntensity: 0.3"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="分享战绩" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 查看详情 -->
+            <a-entity id="details-btn" position="0 0 0">
+                <a-plane 
+                    width="1.2" 
+                    height="0.4" 
+                    color="#0066cc" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="查看详情" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 返回 -->
+            <a-entity id="back-btn" position="1.5 0 0">
+                <a-plane 
+                    width="1.2" 
+                    height="0.4" 
+                    color="#cc6600" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="返回" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 装饰性全息效果 -->
+        <a-entity id="holographic-effects">
+            <!-- 数据流 -->
+            <a-entity id="data-streams">
+                <a-torus 
+                    position="0 0.5 0" 
+                    radius="4" 
+                    radius-tubular="0.02" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.4">
+                    <a-animation attribute="rotation" 
+                        to="0 360 0" 
+                        dur="25000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-torus>
+            </a-entity>
+
+            <!-- 浮动数据点 -->
+            <a-entity id="floating-data">
+                <a-sphere 
+                    position="3 3 2" 
+                    radius="0.03" 
+                    color="#ffaa00" 
+                    material="emissive: #ffaa00; emissiveIntensity: 0.8">
+                    <a-animation attribute="position" 
+                        to="3 1 2" 
+                        direction="alternate" 
+                        dur="5000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                <a-sphere 
+                    position="-3 2 -2" 
+                    radius="0.03" 
+                    color="#ff6600" 
+                    material="emissive: #ff6600; emissiveIntensity: 0.8">
+                    <a-animation attribute="position" 
+                        to="-3 4 -2" 
+                        direction="alternate" 
+                        dur="4000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+            </a-entity>
+        </a-entity>
+
+        <!-- 用户摄像头和控制器 -->
+        <a-entity id="rig" position="0 1.6 0">
+            <a-camera 
+                look-controls="pointerLockEnabled: true"
+                wasd-controls="enabled: false">
+                <!-- 准星 -->
+                <a-ring 
+                    position="0 0 -0.5" 
+                    radius-inner="0.005" 
+                    radius-outer="0.01" 
+                    color="#00ffff" 
+                    material="transparent: true; opacity: 0.6">
+                </a-ring>
+            </a-camera>
+            
+            <!-- 左手控制器 -->
+            <a-entity 
+                id="left-hand" 
+                hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+            
+            <!-- 右手控制器 -->
+            <a-entity 
+                id="right-hand" 
+                hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+        </a-entity>
+
+        <!-- 交互脚本 -->
+        <script>
+            // 战绩数据
+            const playerStats = {
+                name: '星战指挥官',
+                level: 25,
+                experience: 8750,
+                maxExperience: 10000,
+                totalGames: 156,
+                wins: 106,
+                losses: 50,
+                kills: 1247,
+                deaths: 623,
+                assists: 934,
+                bestKills: 25,
+                longestKillStreak: 15,
+                favoriteWeapon: 'AK-47',
+                accuracy: 72,
+                totalScore: 9850,
+                rank: 15
+            };
+
+            // 计算KDA
+            function calculateKDA() {
+                return ((playerStats.kills + playerStats.assists) / Math.max(playerStats.deaths, 1)).toFixed(1);
+            }
+
+            // 计算胜率
+            function calculateWinRate() {
+                return Math.round((playerStats.wins / playerStats.totalGames) * 100);
+            }
+
+            // 按钮点击事件
+            document.querySelector('#share-btn').addEventListener('click', function() {
+                console.log('分享战绩被点击');
+                // 分享战绩到社交媒体
+            });
+
+            document.querySelector('#details-btn').addEventListener('click', function() {
+                console.log('查看详情被点击');
+                // 显示更详细的统计信息
+            });
+
+            document.querySelector('#back-btn').addEventListener('click', function() {
+                console.log('返回被点击');
+                // 返回主菜单
+            });
+
+            // 统计面板点击事件
+            document.querySelectorAll('#detailed-stats .clickable').forEach(panel => {
+                panel.addEventListener('click', function() {
+                    console.log('统计面板被点击:', panel.id);
+                    // 显示详细信息
+                });
+            });
+
+            // 排行榜点击事件
+            document.querySelectorAll('#leaderboard .clickable').forEach(rank => {
+                rank.addEventListener('click', function() {
+                    console.log('排行榜项目被点击:', rank.id);
+                    // 查看其他玩家详情
+                });
+            });
+
+            // 成就点击事件
+            document.querySelectorAll('#achievements .clickable').forEach(achievement => {
+                achievement.addEventListener('click', function() {
+                    console.log('成就被点击:', achievement.id);
+                    // 显示成就详情
+                });
+            });
+
+            // 动态更新统计数据
+            function updateStatsDisplay() {
+                // 这里可以添加动态更新统计显示的逻辑
+                console.log('KDA:', calculateKDA());
+                console.log('胜率:', calculateWinRate() + '%');
+            }
+
+            // 模拟数据更新
+            setInterval(() => {
+                // 模拟实时数据更新
+                updateStatsDisplay();
+            }, 5000);
+
+            // 初始化显示
+            updateStatsDisplay();
+        </script>
+    </a-scene>
+</body>
+</html>

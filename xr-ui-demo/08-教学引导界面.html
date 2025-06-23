@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR星战大联盟 - 教学引导界面</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        #ui-overlay {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #00ffff;
+            font-family: 'Arial', sans-serif;
+            z-index: 1000;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui-overlay">
+        <div>MR星战大联盟 - 教学引导界面</div>
+        <div>新手训练营 | 战斗技能学习</div>
+    </div>
+
+    <a-scene 
+        background="color: #000033"
+        vr-mode-ui="enabled: true"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="dotsColor: #00ffff; backgroundColor: #000">
+        
+        <!-- 资源预加载 -->
+        <a-assets>
+            <a-mixin id="tutorial-step" 
+                animation__mouseenter="property: scale; to: 1.05 1.05 1.05; startEvents: mouseenter; dur: 200"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200">
+            </a-mixin>
+            <a-mixin id="highlight-effect" 
+                animation__pulse="property: scale; to: 1.1 1.1 1.1; direction: alternate; dur: 1000; repeat: indefinite">
+            </a-mixin>
+        </a-assets>
+
+        <!-- 环境光照 -->
+        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="directional" position="3 5 4" color="#ffffff" intensity="0.7"></a-light>
+        <a-light type="point" position="0 3 0" color="#00ffff" intensity="1.0"></a-light>
+
+        <!-- 全息投影背景 -->
+        <a-sky color="#000044">
+            <a-animation attribute="rotation" 
+                to="0 360 0" 
+                dur="200000" 
+                repeat="indefinite">
+            </a-animation>
+        </a-sky>
+
+        <!-- 中央教学控制台 -->
+        <a-entity id="tutorial-console" position="0 1.5 0">
+            <!-- 基座 -->
+            <a-cylinder 
+                radius="1.5" 
+                height="0.1" 
+                color="#001133" 
+                material="emissive: #002266; emissiveIntensity: 0.4; metalness: 0.8">
+                <a-animation attribute="rotation" 
+                    to="0 360 0" 
+                    dur="50000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-cylinder>
+
+            <!-- 教学标题 -->
+            <a-entity id="tutorial-title" position="0 0.8 0">
+                <a-text 
+                    value="新手训练营" 
+                    position="0 0.3 0" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="10">
+                </a-text>
+                <a-text 
+                    value="掌握战斗技能，成为星际战士" 
+                    position="0 0.1 0" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    id="current-step" 
+                    value="第1步：基础移动" 
+                    position="0 -0.1 0" 
+                    align="center" 
+                    color="#ffaa00" 
+                    width="7">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 教学步骤列表 (左侧) -->
+        <a-entity id="tutorial-steps" position="-4 2 0">
+            <a-text 
+                value="训练课程" 
+                position="0 1.5 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 步骤1：基础移动 -->
+            <a-entity id="step-1" position="0 1 0">
+                <a-plane 
+                    width="3" 
+                    height="0.4" 
+                    color="#003300" 
+                    material="emissive: #006600; emissiveIntensity: 0.3"
+                    mixin="tutorial-step"
+                    class="clickable step-btn"
+                    data-step="1">
+                </a-plane>
+                <a-text 
+                    value="✓ 1. 基础移动" 
+                    position="-1.2 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="学会使用手柄移动" 
+                    position="-1.2 -0.1 0.01" 
+                    align="left" 
+                    color="#00ff00" 
+                    width="4">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0 0.01" 
+                    radius="0.05" 
+                    color="#00ff00" 
+                    material="emissive: #00ff00; emissiveIntensity: 0.8">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 步骤2：瞄准射击 -->
+            <a-entity id="step-2" position="0 0.5 0">
+                <a-plane 
+                    width="3" 
+                    height="0.4" 
+                    color="#001122" 
+                    mixin="tutorial-step"
+                    class="clickable step-btn"
+                    data-step="2">
+                </a-plane>
+                <a-text 
+                    value="2. 瞄准射击" 
+                    position="-1.2 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="掌握瞄准和开火技巧" 
+                    position="-1.2 -0.1 0.01" 
+                    align="left" 
+                    color="#888888" 
+                    width="4">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0 0.01" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 步骤3：武器切换 -->
+            <a-entity id="step-3" position="0 0 0">
+                <a-plane 
+                    width="3" 
+                    height="0.4" 
+                    color="#001122" 
+                    mixin="tutorial-step"
+                    class="clickable step-btn"
+                    data-step="3">
+                </a-plane>
+                <a-text 
+                    value="3. 武器切换" 
+                    position="-1.2 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="学会快速切换武器" 
+                    position="-1.2 -0.1 0.01" 
+                    align="left" 
+                    color="#888888" 
+                    width="4">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0 0.01" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 步骤4：掩体使用 -->
+            <a-entity id="step-4" position="0 -0.5 0">
+                <a-plane 
+                    width="3" 
+                    height="0.4" 
+                    color="#001122" 
+                    mixin="tutorial-step"
+                    class="clickable step-btn"
+                    data-step="4">
+                </a-plane>
+                <a-text 
+                    value="4. 掩体使用" 
+                    position="-1.2 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="利用环境进行防护" 
+                    position="-1.2 -0.1 0.01" 
+                    align="left" 
+                    color="#888888" 
+                    width="4">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0 0.01" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 步骤5：团队协作 -->
+            <a-entity id="step-5" position="0 -1 0">
+                <a-plane 
+                    width="3" 
+                    height="0.4" 
+                    color="#001122" 
+                    mixin="tutorial-step"
+                    class="clickable step-btn"
+                    data-step="5">
+                </a-plane>
+                <a-text 
+                    value="5. 团队协作" 
+                    position="-1.2 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="与队友配合作战" 
+                    position="-1.2 -0.1 0.01" 
+                    align="left" 
+                    color="#888888" 
+                    width="4">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0 0.01" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 步骤6：实战演练 -->
+            <a-entity id="step-6" position="0 -1.5 0">
+                <a-plane 
+                    width="3" 
+                    height="0.4" 
+                    color="#001122" 
+                    mixin="tutorial-step"
+                    class="clickable step-btn"
+                    data-step="6">
+                </a-plane>
+                <a-text 
+                    value="6. 实战演练" 
+                    position="-1.2 0.05 0.01" 
+                    align="left" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+                <a-text 
+                    value="综合技能测试" 
+                    position="-1.2 -0.1 0.01" 
+                    align="left" 
+                    color="#888888" 
+                    width="4">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0 0.01" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+        </a-entity>
+
+        <!-- 教学内容展示区 (右侧) -->
+        <a-entity id="tutorial-content" position="4 2 0">
+            <a-text 
+                value="教学内容" 
+                position="0 1.5 0" 
+                align="center" 
+                color="#ffffff" 
+                width="8">
+            </a-text>
+
+            <!-- 内容背景 -->
+            <a-plane 
+                width="3.5" 
+                height="3" 
+                color="#001122" 
+                material="transparent: true; opacity: 0.8">
+            </a-plane>
+
+            <!-- 当前教学内容 -->
+            <a-entity id="content-display">
+                <!-- 步骤1内容：基础移动 -->
+                <a-entity id="content-1" visible="true">
+                    <a-text 
+                        value="基础移动训练" 
+                        position="0 1.2 0.01" 
+                        align="center" 
+                        color="#ffaa00" 
+                        width="6">
+                    </a-text>
+                    
+                    <!-- 手柄示意图 -->
+                    <a-entity id="controller-demo" position="0 0.5 0.01">
+                        <a-box 
+                            width="0.3" 
+                            height="0.15" 
+                            depth="0.05" 
+                            color="#333333" 
+                            material="emissive: #666666; emissiveIntensity: 0.2">
+                        </a-box>
+                        <!-- 摇杆 -->
+                        <a-cylinder 
+                            position="-0.08 0.08 0.03" 
+                            radius="0.03" 
+                            height="0.02" 
+                            color="#00ff00" 
+                            material="emissive: #00ff00; emissiveIntensity: 0.5"
+                            mixin="highlight-effect">
+                        </a-cylinder>
+                        <a-text 
+                            value="左摇杆" 
+                            position="-0.08 -0.15 0" 
+                            align="center" 
+                            color="#00ff00" 
+                            width="3">
+                        </a-text>
+                    </a-entity>
+                    
+                    <a-text 
+                        value="操作说明：" 
+                        position="-1.5 0 0.01" 
+                        align="left" 
+                        color="#ffffff" 
+                        width="5">
+                    </a-text>
+                    <a-text 
+                        value="• 推动左摇杆向前移动" 
+                        position="-1.5 -0.2 0.01" 
+                        align="left" 
+                        color="#00ffff" 
+                        width="4">
+                    </a-text>
+                    <a-text 
+                        value="• 推动左摇杆向后后退" 
+                        position="-1.5 -0.4 0.01" 
+                        align="left" 
+                        color="#00ffff" 
+                        width="4">
+                    </a-text>
+                    <a-text 
+                        value="• 左右推动进行横移" 
+                        position="-1.5 -0.6 0.01" 
+                        align="left" 
+                        color="#00ffff" 
+                        width="4">
+                    </a-text>
+                    <a-text 
+                        value="• 转动头部改变视角" 
+                        position="-1.5 -0.8 0.01" 
+                        align="left" 
+                        color="#00ffff" 
+                        width="4">
+                    </a-text>
+                    
+                    <!-- 进度条 -->
+                    <a-entity id="progress-1" position="0 -1.2 0.01">
+                        <a-text 
+                            value="训练进度: 100%" 
+                            position="0 0.1 0" 
+                            align="center" 
+                            color="#00ff00" 
+                            width="4">
+                        </a-text>
+                        <a-plane 
+                            width="2" 
+                            height="0.05" 
+                            color="#333333">
+                        </a-plane>
+                        <a-plane 
+                            position="0 0 0.001" 
+                            width="2" 
+                            height="0.05" 
+                            color="#00ff00" 
+                            material="emissive: #00ff00; emissiveIntensity: 0.3">
+                        </a-plane>
+                    </a-entity>
+                </a-entity>
+
+                <!-- 其他步骤内容默认隐藏 -->
+                <a-entity id="content-2" visible="false">
+                    <a-text 
+                        value="瞄准射击训练" 
+                        position="0 1.2 0.01" 
+                        align="center" 
+                        color="#ffaa00" 
+                        width="6">
+                    </a-text>
+                    <a-text 
+                        value="学习如何精确瞄准目标并开火" 
+                        position="0 0.8 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                    <!-- 瞄准示意 -->
+                    <a-entity id="aim-demo" position="0 0.3 0.01">
+                        <a-ring 
+                            radius-inner="0.08" 
+                            radius-outer="0.12" 
+                            color="#ff0000" 
+                            material="emissive: #ff0000; emissiveIntensity: 0.5"
+                            mixin="highlight-effect">
+                        </a-ring>
+                        <a-text 
+                            value="瞄准准星" 
+                            position="0 -0.3 0" 
+                            align="center" 
+                            color="#ff0000" 
+                            width="4">
+                        </a-text>
+                    </a-entity>
+                </a-entity>
+
+                <a-entity id="content-3" visible="false">
+                    <a-text 
+                        value="武器切换训练" 
+                        position="0 1.2 0.01" 
+                        align="center" 
+                        color="#ffaa00" 
+                        width="6">
+                    </a-text>
+                    <a-text 
+                        value="快速切换不同类型的武器" 
+                        position="0 0.8 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+
+                <a-entity id="content-4" visible="false">
+                    <a-text 
+                        value="掩体使用训练" 
+                        position="0 1.2 0.01" 
+                        align="center" 
+                        color="#ffaa00" 
+                        width="6">
+                    </a-text>
+                    <a-text 
+                        value="学会利用环境掩体保护自己" 
+                        position="0 0.8 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+
+                <a-entity id="content-5" visible="false">
+                    <a-text 
+                        value="团队协作训练" 
+                        position="0 1.2 0.01" 
+                        align="center" 
+                        color="#ffaa00" 
+                        width="6">
+                    </a-text>
+                    <a-text 
+                        value="与队友配合，发挥团队优势" 
+                        position="0 0.8 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+
+                <a-entity id="content-6" visible="false">
+                    <a-text 
+                        value="实战演练" 
+                        position="0 1.2 0.01" 
+                        align="center" 
+                        color="#ffaa00" 
+                        width="6">
+                    </a-text>
+                    <a-text 
+                        value="综合运用所学技能进行实战" 
+                        position="0 0.8 0.01" 
+                        align="center" 
+                        color="#ffffff" 
+                        width="4">
+                    </a-text>
+                </a-entity>
+            </a-entity>
+        </a-entity>
+
+        <!-- 虚拟训练场景 (中央后方) -->
+        <a-entity id="training-scene" position="0 1 -3">
+            <!-- 训练目标 -->
+            <a-entity id="training-targets">
+                <a-sphere 
+                    id="target-1" 
+                    position="-2 1.5 0" 
+                    radius="0.2" 
+                    color="#ff0000" 
+                    material="emissive: #ff0000; emissiveIntensity: 0.4"
+                    class="clickable training-target">
+                    <a-animation attribute="position" 
+                        to="-2 2 0" 
+                        direction="alternate" 
+                        dur="2000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                
+                <a-sphere 
+                    id="target-2" 
+                    position="0 1.8 0" 
+                    radius="0.15" 
+                    color="#ff0000" 
+                    material="emissive: #ff0000; emissiveIntensity: 0.4"
+                    class="clickable training-target">
+                    <a-animation attribute="position" 
+                        to="0 1.2 0" 
+                        direction="alternate" 
+                        dur="3000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                
+                <a-sphere 
+                    id="target-3" 
+                    position="2 1.3 0" 
+                    radius="0.18" 
+                    color="#ff0000" 
+                    material="emissive: #ff0000; emissiveIntensity: 0.4"
+                    class="clickable training-target">
+                    <a-animation attribute="position" 
+                        to="2 1.8 0" 
+                        direction="alternate" 
+                        dur="2500" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+            </a-entity>
+
+            <!-- 掩体 -->
+            <a-entity id="cover-objects">
+                <a-box 
+                    position="-1 0.5 1" 
+                    width="0.5" 
+                    height="1" 
+                    depth="0.3" 
+                    color="#666666" 
+                    material="metalness: 0.8">
+                </a-box>
+                <a-box 
+                    position="1 0.5 1" 
+                    width="0.5" 
+                    height="1" 
+                    depth="0.3" 
+                    color="#666666" 
+                    material="metalness: 0.8">
+                </a-box>
+            </a-entity>
+        </a-entity>
+
+        <!-- 控制按钮区域 -->
+        <a-entity id="control-buttons" position="0 0.2 3">
+            <!-- 开始训练 -->
+            <a-entity id="start-training-btn" position="-2 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#006600" 
+                    material="transparent: true; opacity: 0.9; emissive: #004400; emissiveIntensity: 0.3"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="开始训练" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 重新开始 -->
+            <a-entity id="restart-btn" position="-0.5 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#cc6600" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="重新开始" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 跳过教学 -->
+            <a-entity id="skip-btn" position="1 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#666666" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="跳过教学" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 返回主菜单 -->
+            <a-entity id="back-btn" position="2.5 0 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.4" 
+                    color="#cc3300" 
+                    material="transparent: true; opacity: 0.9"
+                    class="clickable">
+                </a-plane>
+                <a-text 
+                    value="返回主菜单" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 提示信息显示 -->
+        <a-entity id="hint-display" position="0 0.8 2">
+            <a-plane 
+                width="4" 
+                height="0.6" 
+                color="#000011" 
+                material="transparent: true; opacity: 0.8">
+            </a-plane>
+            <a-text 
+                id="hint-text" 
+                value="欢迎来到新手训练营！请选择一个训练项目开始学习。" 
+                position="0 0 0.01" 
+                align="center" 
+                color="#ffffff" 
+                width="6">
+            </a-text>
+        </a-entity>
+
+        <!-- 装饰性全息效果 -->
+        <a-entity id="holographic-effects">
+            <!-- 训练场边界 -->
+            <a-entity id="training-boundary">
+                <a-torus 
+                    position="0 0 -3" 
+                    radius="4" 
+                    radius-tubular="0.01" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.2; transparent: true; opacity: 0.4">
+                    <a-animation attribute="rotation" 
+                        to="0 360 0" 
+                        dur="30000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-torus>
+            </a-entity>
+
+            <!-- 数据流效果 -->
+            <a-entity id="data-streams">
+                <a-sphere 
+                    position="6 2 1" 
+                    radius="0.03" 
+                    color="#00ff00" 
+                    material="emissive: #00ff00; emissiveIntensity: 0.8">
+                    <a-animation attribute="position" 
+                        to="6 3 1" 
+                        direction="alternate" 
+                        dur="2000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+                <a-sphere 
+                    position="-6 1 -1" 
+                    radius="0.03" 
+                    color="#ff6600" 
+                    material="emissive: #ff6600; emissiveIntensity: 0.8">
+                    <a-animation attribute="position" 
+                        to="-6 2 -1" 
+                        direction="alternate" 
+                        dur="3000" 
+                        repeat="indefinite">
+                    </a-animation>
+                </a-sphere>
+            </a-entity>
+        </a-entity>
+
+        <!-- 用户摄像头和控制器 -->
+        <a-entity id="rig" position="0 1.6 0">
+            <a-camera 
+                look-controls="pointerLockEnabled: true"
+                wasd-controls="enabled: false">
+                <!-- 准星 -->
+                <a-ring 
+                    position="0 0 -0.5" 
+                    radius-inner="0.005" 
+                    radius-outer="0.01" 
+                    color="#00ffff" 
+                    material="transparent: true; opacity: 0.6">
+                </a-ring>
+            </a-camera>
+            
+            <!-- 左手控制器 -->
+            <a-entity 
+                id="left-hand" 
+                hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+            
+            <!-- 右手控制器 -->
+            <a-entity 
+                id="right-hand" 
+                hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+        </a-entity>
+
+        <!-- 交互脚本 -->
+        <script>
+            // 教学数据
+            const tutorialData = {
+                currentStep: 1,
+                steps: [
+                    {
+                        id: 1,
+                        title: "基础移动",
+                        description: "学会使用手柄移动",
+                        completed: true,
+                        content: "掌握基本的移动操作，包括前进、后退、左右移动和转向。",
+                        hints: [
+                            "推动左摇杆向前移动",
+                            "推动左摇杆向后后退",
+                            "左右推动进行横移",
+                            "转动头部改变视角"
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "瞄准射击",
+                        description: "掌握瞄准和开火技巧",
+                        completed: false,
+                        content: "学习如何精确瞄准目标并开火，提高命中率。",
+                        hints: [
+                            "使用右手控制器瞄准",
+                            "按下扳机键开火",
+                            "保持稳定的瞄准姿势",
+                            "预判移动目标的位置"
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "武器切换",
+                        description: "学会快速切换武器",
+                        completed: false,
+                        content: "掌握不同武器的特点和快速切换技巧。",
+                        hints: [
+                            "按下武器切换键",
+                            "了解不同武器的特点",
+                            "根据战况选择合适武器",
+                            "熟练掌握切换时机"
+                        ]
+                    },
+                    {
+                        id: 4,
+                        title: "掩体使用",
+                        description: "利用环境进行防护",
+                        completed: false,
+                        content: "学会利用环境掩体保护自己，减少受到的伤害。",
+                        hints: [
+                            "寻找合适的掩体位置",
+                            "学会探头射击",
+                            "掌握掩体间的移动",
+                            "避免长时间暴露"
+                        ]
+                    },
+                    {
+                        id: 5,
+                        title: "团队协作",
+                        description: "与队友配合作战",
+                        completed: false,
+                        content: "学习与队友配合，发挥团队优势。",
+                        hints: [
+                            "与队友保持沟通",
+                            "学会配合进攻",
+                            "互相掩护前进",
+                            "分工合作完成任务"
+                        ]
+                    },
+                    {
+                        id: 6,
+                        title: "实战演练",
+                        description: "综合技能测试",
+                        completed: false,
+                        content: "综合运用所学技能进行实战演练。",
+                        hints: [
+                            "运用所有学到的技能",
+                            "保持冷静和专注",
+                            "灵活应对各种情况",
+                            "争取最佳战绩"
+                        ]
+                    }
+                ]
+            };
+
+            let trainingActive = false;
+            let targetHits = 0;
+
+            // 步骤按钮点击事件
+            document.querySelectorAll('.step-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const stepId = parseInt(this.dataset.step);
+                    switchToStep(stepId);
+                });
+            });
+
+            // 切换到指定步骤
+            function switchToStep(stepId) {
+                tutorialData.currentStep = stepId;
+                const step = tutorialData.steps[stepId - 1];
+                
+                // 更新当前步骤显示
+                document.getElementById('current-step').setAttribute('value', `第${stepId}步：${step.title}`);
+                
+                // 隐藏所有内容
+                for (let i = 1; i <= 6; i++) {
+                    document.getElementById(`content-${i}`).setAttribute('visible', 'false');
+                }
+                
+                // 显示当前步骤内容
+                document.getElementById(`content-${stepId}`).setAttribute('visible', 'true');
+                
+                // 更新提示信息
+                updateHintText(step);
+                
+                // 更新步骤状态显示
+                updateStepStatus();
+                
+                console.log(`切换到步骤 ${stepId}: ${step.title}`);
+            }
+
+            // 更新提示文本
+            function updateHintText(step) {
+                const hintText = `当前训练：${step.title}\n${step.content}`;
+                document.getElementById('hint-text').setAttribute('value', hintText);
+            }
+
+            // 更新步骤状态显示
+            function updateStepStatus() {
+                tutorialData.steps.forEach((step, index) => {
+                    const stepElement = document.getElementById(`step-${step.id}`);
+                    const plane = stepElement.querySelector('a-plane');
+                    const text = stepElement.querySelector('a-text');
+                    const indicator = stepElement.querySelector('a-sphere');
+                    
+                    if (step.completed) {
+                        plane.setAttribute('color', '#003300');
+                        plane.setAttribute('material', 'emissive: #006600; emissiveIntensity: 0.3');
+                        text.setAttribute('value', `✓ ${step.id}. ${step.title}`);
+                        indicator.setAttribute('color', '#00ff00');
+                        indicator.setAttribute('material', 'emissive: #00ff00; emissiveIntensity: 0.8');
+                    } else if (step.id === tutorialData.currentStep) {
+                        plane.setAttribute('color', '#331100');
+                        plane.setAttribute('material', 'emissive: #664400; emissiveIntensity: 0.4');
+                        text.setAttribute('value', `▶ ${step.id}. ${step.title}`);
+                        indicator.setAttribute('color', '#ffaa00');
+                        indicator.setAttribute('material', 'emissive: #ffaa00; emissiveIntensity: 0.8');
+                    } else {
+                        plane.setAttribute('color', '#001122');
+                        plane.setAttribute('material', 'emissive: none');
+                        text.setAttribute('value', `${step.id}. ${step.title}`);
+                        indicator.setAttribute('color', '#666666');
+                        indicator.setAttribute('material', 'emissive: #666666; emissiveIntensity: 0.3');
+                    }
+                });
+            }
+
+            // 训练目标点击事件
+            document.querySelectorAll('.training-target').forEach(target => {
+                target.addEventListener('click', function() {
+                    if (trainingActive) {
+                        targetHits++;
+                        console.log(`击中目标！总击中数: ${targetHits}`);
+                        
+                        // 目标击中效果
+                        this.setAttribute('color', '#00ff00');
+                        this.setAttribute('material', 'emissive: #00ff00; emissiveIntensity: 0.8');
+                        
+                        setTimeout(() => {
+                            this.setAttribute('color', '#ff0000');
+                            this.setAttribute('material', 'emissive: #ff0000; emissiveIntensity: 0.4');
+                        }, 500);
+                        
+                        // 检查是否完成训练
+                        if (targetHits >= 5 && tutorialData.currentStep === 2) {
+                            completeCurrentStep();
+                        }
+                    }
+                });
+            });
+
+            // 完成当前步骤
+            function completeCurrentStep() {
+                const currentStep = tutorialData.steps[tutorialData.currentStep - 1];
+                currentStep.completed = true;
+                
+                console.log(`完成步骤: ${currentStep.title}`);
+                
+                // 更新显示
+                updateStepStatus();
+                
+                // 自动进入下一步骤
+                if (tutorialData.currentStep < 6) {
+                    setTimeout(() => {
+                        switchToStep(tutorialData.currentStep + 1);
+                    }, 2000);
+                } else {
+                    // 所有步骤完成
+                    document.getElementById('hint-text').setAttribute('value', '恭喜！您已完成所有训练课程，现在可以开始实战了！');
+                }
+            }
+
+            // 控制按钮事件
+            document.getElementById('start-training-btn').addEventListener('click', function() {
+                trainingActive = true;
+                targetHits = 0;
+                console.log('开始训练');
+                document.getElementById('hint-text').setAttribute('value', '训练开始！请按照指示完成各项训练任务。');
+            });
+
+            document.getElementById('restart-btn').addEventListener('click', function() {
+                console.log('重新开始当前训练');
+                trainingActive = true;
+                targetHits = 0;
+                const currentStep = tutorialData.steps[tutorialData.currentStep - 1];
+                updateHintText(currentStep);
+            });
+
+            document.getElementById('skip-btn').addEventListener('click', function() {
+                console.log('跳过当前步骤');
+                completeCurrentStep();
+            });
+
+            document.getElementById('back-btn').addEventListener('click', function() {
+                console.log('返回主菜单');
+                // 返回主菜单逻辑
+            });
+
+            // 键盘事件处理（用于模拟训练进度）
+            document.addEventListener('keydown', function(event) {
+                if (trainingActive) {
+                    switch(event.key) {
+                        case 'w':
+                        case 'a':
+                        case 's':
+                        case 'd':
+                            if (tutorialData.currentStep === 1) {
+                                // 模拟移动训练完成
+                                setTimeout(() => {
+                                    completeCurrentStep();
+                                }, 1000);
+                            }
+                            break;
+                        case ' ':
+                            if (tutorialData.currentStep === 2) {
+                                // 模拟射击
+                                console.log('射击！');
+                            }
+                            break;
+                    }
+                }
+            });
+
+            // 初始化
+            updateStepStatus();
+            const initialStep = tutorialData.steps[0];
+            updateHintText(initialStep);
+        </script>
+    </a-scene>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR星战大联盟 - 主菜单界面</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        #ui-overlay {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #00ffff;
+            font-family: 'Arial', sans-serif;
+            z-index: 1000;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui-overlay">
+        <div>MR星战大联盟 - 主菜单界面</div>
+        <div>PICO 4 Enterprise | 3D空间UI设计</div>
+    </div>
+
+    <a-scene 
+        background="color: #0a0a0a"
+        vr-mode-ui="enabled: true"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="dotsColor: #00ffff; backgroundColor: #000">
+        
+        <!-- 资源预加载 -->
+        <a-assets>
+            <a-mixin id="button-hover" 
+                animation__mouseenter="property: scale; to: 1.1 1.1 1.1; startEvents: mouseenter; dur: 200"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200">
+            </a-mixin>
+            <a-mixin id="glow-material" 
+                material="shader: standard; emissive: #003366; emissiveIntensity: 0.3">
+            </a-mixin>
+        </a-assets>
+
+        <!-- 环境光照 -->
+        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="directional" position="2 4 5" color="#ffffff" intensity="0.8"></a-light>
+        <a-light type="point" position="0 2 0" color="#00ffff" intensity="0.5"></a-light>
+
+        <!-- 星空背景 -->
+        <a-sky color="#000011">
+            <a-animation attribute="rotation" 
+                to="0 360 0" 
+                dur="120000" 
+                repeat="indefinite">
+            </a-animation>
+        </a-sky>
+
+        <!-- 星点粒子效果 -->
+        <a-entity id="stars">
+            <a-sphere position="10 8 -5" radius="0.02" color="#ffffff" opacity="0.8"></a-sphere>
+            <a-sphere position="-8 6 -8" radius="0.015" color="#00ffff" opacity="0.6"></a-sphere>
+            <a-sphere position="5 -4 -6" radius="0.02" color="#ffffff" opacity="0.9"></a-sphere>
+            <a-sphere position="-6 -3 -7" radius="0.01" color="#66ccff" opacity="0.7"></a-sphere>
+            <a-sphere position="12 2 -9" radius="0.018" color="#ffffff" opacity="0.8"></a-sphere>
+        </a-entity>
+
+        <!-- 主菜单面板 -->
+        <a-entity id="main-menu" position="0 1.6 -1.5">
+            <!-- 背景面板 -->
+            <a-plane 
+                width="3" 
+                height="2.5" 
+                color="#001122" 
+                opacity="0.8"
+                material="transparent: true; shader: standard; emissive: #002244; emissiveIntensity: 0.2"
+                geometry="primitive: plane"
+                position="0 0 -0.01">
+                <a-animation attribute="material.emissiveIntensity" 
+                    to="0.4" 
+                    direction="alternate" 
+                    dur="3000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-plane>
+
+            <!-- 游戏标题 -->
+            <a-text 
+                value="MR星战大联盟" 
+                position="0 0.8 0" 
+                align="center" 
+                color="#00ffff" 
+                font="kelsonsans" 
+                width="8"
+                geometry="primitive: plane; width: auto; height: auto"
+                material="color: transparent">
+                <a-animation attribute="color" 
+                    to="#66ffff" 
+                    direction="alternate" 
+                    dur="2000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-text>
+
+            <!-- 副标题 -->
+            <a-text 
+                value="GALACTIC BATTLE ALLIANCE" 
+                position="0 0.5 0" 
+                align="center" 
+                color="#888888" 
+                width="4">
+            </a-text>
+
+            <!-- 微信登录按钮 -->
+            <a-entity id="login-btn" position="0 0.1 0">
+                <a-plane 
+                    width="2" 
+                    height="0.4" 
+                    color="#00aa00" 
+                    mixin="button-hover glow-material"
+                    class="clickable"
+                    material="transparent: true; opacity: 0.9">
+                </a-plane>
+                <a-text 
+                    value="微信扫码登录" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+            </a-entity>
+
+            <!-- 开始游戏按钮 -->
+            <a-entity id="start-btn" position="0 -0.4 0">
+                <a-plane 
+                    width="2" 
+                    height="0.4" 
+                    color="#ff6600" 
+                    mixin="button-hover glow-material"
+                    class="clickable"
+                    material="transparent: true; opacity: 0.9">
+                </a-plane>
+                <a-text 
+                    value="开始游戏" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+            </a-entity>
+
+            <!-- 战绩查看按钮 -->
+            <a-entity id="stats-btn" position="-1.2 -0.9 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.3" 
+                    color="#0066cc" 
+                    mixin="button-hover glow-material"
+                    class="clickable"
+                    material="transparent: true; opacity: 0.9">
+                </a-plane>
+                <a-text 
+                    value="战绩" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 好友系统按钮 -->
+            <a-entity id="friends-btn" position="0 -0.9 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.3" 
+                    color="#cc0066" 
+                    mixin="button-hover glow-material"
+                    class="clickable"
+                    material="transparent: true; opacity: 0.9">
+                </a-plane>
+                <a-text 
+                    value="好友" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+
+            <!-- 设置按钮 -->
+            <a-entity id="settings-btn" position="1.2 -0.9 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.3" 
+                    color="#666666" 
+                    mixin="button-hover glow-material"
+                    class="clickable"
+                    material="transparent: true; opacity: 0.9">
+                </a-plane>
+                <a-text 
+                    value="设置" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="5">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- 装饰性3D元素 -->
+        <a-entity id="decorative-elements">
+            <!-- 旋转的能量环 -->
+            <a-torus 
+                position="-2 1.6 -2" 
+                radius="0.3" 
+                radius-tubular="0.02" 
+                color="#00ffff" 
+                material="emissive: #00ffff; emissiveIntensity: 0.5; transparent: true; opacity: 0.7">
+                <a-animation attribute="rotation" 
+                    to="0 360 0" 
+                    dur="4000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-torus>
+
+            <a-torus 
+                position="2 1.6 -2" 
+                radius="0.25" 
+                radius-tubular="0.015" 
+                color="#ff6600" 
+                material="emissive: #ff6600; emissiveIntensity: 0.5; transparent: true; opacity: 0.7">
+                <a-animation attribute="rotation" 
+                    to="0 -360 0" 
+                    dur="5000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-torus>
+        </a-entity>
+
+        <!-- 用户摄像头和控制器 -->
+        <a-entity id="rig" position="0 1.6 0">
+            <a-camera 
+                look-controls="pointerLockEnabled: true"
+                wasd-controls="enabled: false">
+                <!-- 准星 -->
+                <a-ring 
+                    position="0 0 -0.5" 
+                    radius-inner="0.005" 
+                    radius-outer="0.01" 
+                    color="#00ffff" 
+                    material="transparent: true; opacity: 0.6">
+                </a-ring>
+            </a-camera>
+            
+            <!-- 左手控制器 -->
+            <a-entity 
+                id="left-hand" 
+                hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+            
+            <!-- 右手控制器 -->
+            <a-entity 
+                id="right-hand" 
+                hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 10">
+            </a-entity>
+        </a-entity>
+
+        <!-- 交互脚本 -->
+        <script>
+            // 按钮点击事件
+            document.querySelector('#login-btn').addEventListener('click', function() {
+                console.log('微信登录被点击');
+                // 这里可以添加微信登录逻辑
+            });
+
+            document.querySelector('#start-btn').addEventListener('click', function() {
+                console.log('开始游戏被点击');
+                // 这里可以添加进入游戏逻辑
+            });
+
+            document.querySelector('#stats-btn').addEventListener('click', function() {
+                console.log('战绩查看被点击');
+                // 这里可以添加战绩界面逻辑
+            });
+
+            document.querySelector('#friends-btn').addEventListener('click', function() {
+                console.log('好友系统被点击');
+                // 这里可以添加好友界面逻辑
+            });
+
+            document.querySelector('#settings-btn').addEventListener('click', function() {
+                console.log('设置被点击');
+                // 这里可以添加设置界面逻辑
+            });
+
+            // 语音命令支持
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'zh-CN';
+                recognition.onresult = function(event) {
+                    const command = event.results[0][0].transcript;
+                    if (command.includes('开始游戏')) {
+                        document.querySelector('#start-btn').click();
+                    }
+                };
+                recognition.start();
+            }
+        </script>
+    </a-scene>
+</body>
+</html>

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR星战大联盟 - 3D UI展示</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        #ui-overlay {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #00ffff;
+            z-index: 1000;
+            font-size: 14px;
+        }
+        #navigation-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 17, 34, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #00ffff;
+            color: #ffffff;
+            z-index: 1000;
+        }
+        .nav-button {
+            background: #003366;
+            border: 1px solid #00ffff;
+            color: #ffffff;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-button:hover {
+            background: #0066cc;
+            box-shadow: 0 0 10px #00ffff;
+        }
+        .nav-button.active {
+            background: #006600;
+            border-color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui-overlay">
+        <div>MR星战大联盟 - 3D UI界面展示</div>
+        <div>WebXR 沉浸式体验 | PICO 4UE 优化</div>
+    </div>
+
+    <div id="navigation-panel">
+        <div style="text-align: center; margin-bottom: 10px; color: #00ffff;">界面导航</div>
+        <button class="nav-button active" onclick="showInterface(1)">主菜单</button>
+        <button class="nav-button" onclick="showInterface(2)">房间大厅</button>
+        <button class="nav-button" onclick="showInterface(3)">武器装备</button>
+        <button class="nav-button" onclick="showInterface(4)">游戏HUD</button>
+        <button class="nav-button" onclick="showInterface(5)">战绩统计</button>
+        <button class="nav-button" onclick="showInterface(6)">社交好友</button>
+        <button class="nav-button" onclick="showInterface(7)">设置配置</button>
+        <button class="nav-button" onclick="showInterface(8)">教学引导</button>
+        <button class="nav-button" onclick="showOverview()">总览</button>
+    </div>
+
+    <a-scene 
+        background="color: #000033"
+        vr-mode-ui="enabled: true"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="dotsColor: #00ffff; backgroundColor: #000"
+        embedded
+        style="height: 100vh; width: 100vw;">
+        
+        <!-- 资源预加载 -->
+        <a-assets>
+            <a-mixin id="interface-panel" 
+                animation__mouseenter="property: scale; to: 1.05 1.05 1.05; startEvents: mouseenter; dur: 300"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 300">
+            </a-mixin>
+            <a-mixin id="glow-effect" 
+                animation__glow="property: material.emissiveIntensity; to: 0.8; direction: alternate; dur: 2000; repeat: indefinite">
+            </a-mixin>
+        </a-assets>
+
+        <!-- 环境光照 -->
+        <a-light type="ambient" color="#404040" intensity="0.3"></a-light>
+        <a-light type="directional" position="5 10 5" color="#ffffff" intensity="0.6"></a-light>
+        <a-light type="point" position="0 5 0" color="#00ffff" intensity="1.2"></a-light>
+
+        <!-- 优化的星空背景 -->
+        <a-sky color="#000044"></a-sky>
+
+        <!-- 中央控制台 -->
+        <a-entity id="central-console" position="0 2 0">
+            <a-cylinder 
+                radius="0.8" 
+                height="0.1" 
+                color="#001133" 
+                material="emissive: #002266; emissiveIntensity: 0.4; metalness: 0.8">
+                <a-animation attribute="rotation" 
+                    to="0 360 0" 
+                    dur="60000" 
+                    repeat="indefinite">
+                </a-animation>
+            </a-cylinder>
+            
+            <a-text 
+                value="MR星战大联盟" 
+                position="0 0.5 0" 
+                align="center" 
+                color="#ffffff" 
+                width="12">
+            </a-text>
+            <a-text 
+                value="3D空间UI界面展示" 
+                position="0 0.2 0" 
+                align="center" 
+                color="#00ffff" 
+                width="8">
+            </a-text>
+            <a-text 
+                id="current-interface" 
+                value="当前界面：主菜单" 
+                position="0 -0.1 0" 
+                align="center" 
+                color="#ffaa00" 
+                width="6">
+            </a-text>
+        </a-entity>
+
+        <!-- 3D网格布局的界面展示区域 -->
+        <a-entity id="interface-grid" position="0 0 0">
+            
+            <!-- 第一层：核心界面 (Y=1.5) -->
+            <!-- 1. 主菜单界面 -->
+            <a-entity id="interface-1" position="-4 1.5 -2" visible="true">
+                <a-plane 
+                    width="3" 
+                    height="2" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.9; emissive: #003366; emissiveIntensity: 0.3"
+                    mixin="interface-panel"
+                    class="clickable interface-btn"
+                    data-interface="1">
+                </a-plane>
+                <a-text 
+                    value="01 主菜单界面" 
+                    position="0 0.7 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="游戏入口 | 微信登录" 
+                    position="0 0.4 0.01" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="• 星空背景设计\n• 全息按钮交互\n• 用户身份验证" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#cccccc" 
+                    width="3">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0.7 0.02" 
+                    radius="0.05" 
+                    color="#00ff00" 
+                    material="emissive: #00ff00; emissiveIntensity: 0.8"
+                    mixin="glow-effect">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 2. 房间大厅界面 -->
+            <a-entity id="interface-2" position="0 1.5 -2" visible="false">
+                <a-plane 
+                    width="3" 
+                    height="2" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.9"
+                    mixin="interface-panel"
+                    class="clickable interface-btn"
+                    data-interface="2">
+                </a-plane>
+                <a-text 
+                    value="02 房间大厅界面" 
+                    position="0 0.7 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="多人组队 | 房间管理" 
+                    position="0 0.4 0.01" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="• 环形玩家布局\n• 地图预览显示\n• 实时状态更新" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#cccccc" 
+                    width="3">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0.7 0.02" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 3. 武器装备界面 -->
+            <a-entity id="interface-3" position="4 1.5 -2" visible="false">
+                <a-plane 
+                    width="3" 
+                    height="2" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.9"
+                    mixin="interface-panel"
+                    class="clickable interface-btn"
+                    data-interface="3">
+                </a-plane>
+                <a-text 
+                    value="03 武器装备界面" 
+                    position="0 0.7 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="武器选择 | 装备配置" 
+                    position="0 0.4 0.01" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="• 3D武器展示\n• 配件系统\n• 属性对比" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#cccccc" 
+                    width="3">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0.7 0.02" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 第二层：游戏界面 (Y=0) -->
+            <!-- 4. 游戏内HUD界面 -->
+            <a-entity id="interface-4" position="-4 0 -2" visible="false">
+                <a-plane 
+                    width="3" 
+                    height="2" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.9"
+                    mixin="interface-panel"
+                    class="clickable interface-btn"
+                    data-interface="4">
+                </a-plane>
+                <a-text 
+                    value="04 游戏内HUD界面" 
+                    position="0 0.7 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="实时信息 | 战斗状态" 
+                    position="0 0.4 0.01" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="• 准星系统\n• 生命值显示\n• 小地图导航" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#cccccc" 
+                    width="3">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0.7 0.02" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 5. 战绩统计界面 -->
+            <a-entity id="interface-5" position="0 0 -2" visible="false">
+                <a-plane 
+                    width="3" 
+                    height="2" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.9"
+                    mixin="interface-panel"
+                    class="clickable interface-btn"
+                    data-interface="5">
+                </a-plane>
+                <a-text 
+                    value="05 战绩统计界面" 
+                    position="0 0.7 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="数据分析 | 排行榜" 
+                    position="0 0.4 0.01" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="• 3D数据图表\n• 成就系统\n• 历史记录" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#cccccc" 
+                    width="3">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0.7 0.02" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 6. 社交好友界面 -->
+            <a-entity id="interface-6" position="4 0 -2" visible="false">
+                <a-plane 
+                    width="3" 
+                    height="2" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.9"
+                    mixin="interface-panel"
+                    class="clickable interface-btn"
+                    data-interface="6">
+                </a-plane>
+                <a-text 
+                    value="06 社交好友界面" 
+                    position="0 0.7 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="好友管理 | 战队系统" 
+                    position="0 0.4 0.01" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="• 在线状态\n• 聊天系统\n• 战队管理" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#cccccc" 
+                    width="3">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0.7 0.02" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 第三层：设置界面 (Y=-1.5) -->
+            <!-- 7. 设置配置界面 -->
+            <a-entity id="interface-7" position="-2 -1.5 -2" visible="false">
+                <a-plane 
+                    width="3" 
+                    height="2" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.9"
+                    mixin="interface-panel"
+                    class="clickable interface-btn"
+                    data-interface="7">
+                </a-plane>
+                <a-text 
+                    value="07 设置配置界面" 
+                    position="0 0.7 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="系统设置 | 个人配置" 
+                    position="0 0.4 0.01" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="• 游戏设置\n• 显示配置\n• 控制选项" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#cccccc" 
+                    width="3">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0.7 0.02" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+
+            <!-- 8. 教学引导界面 -->
+            <a-entity id="interface-8" position="2 -1.5 -2" visible="false">
+                <a-plane 
+                    width="3" 
+                    height="2" 
+                    color="#001122" 
+                    material="transparent: true; opacity: 0.9"
+                    mixin="interface-panel"
+                    class="clickable interface-btn"
+                    data-interface="8">
+                </a-plane>
+                <a-text 
+                    value="08 教学引导界面" 
+                    position="0 0.7 0.01" 
+                    align="center" 
+                    color="#ffffff" 
+                    width="6">
+                </a-text>
+                <a-text 
+                    value="新手训练 | 技能学习" 
+                    position="0 0.4 0.01" 
+                    align="center" 
+                    color="#00ffff" 
+                    width="4">
+                </a-text>
+                <a-text 
+                    value="• 训练课程\n• 实战演练\n• 技能评估" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#cccccc" 
+                    width="3">
+                </a-text>
+                <a-sphere 
+                    position="1.2 0.7 0.02" 
+                    radius="0.05" 
+                    color="#666666" 
+                    material="emissive: #666666; emissiveIntensity: 0.3">
+                </a-sphere>
+            </a-entity>
+        </a-entity>
+
+        <!-- 连接线网格 -->
+        <a-entity id="connection-grid">
+            <!-- 水平连接线 -->
+            <a-entity id="horizontal-lines">
+                <!-- 第一层连接线 -->
+                <a-cylinder 
+                    position="-2 1.5 -2" 
+                    radius="0.005" 
+                    height="4" 
+                    rotation="0 0 90" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.6">
+                </a-cylinder>
+                <a-cylinder 
+                    position="2 1.5 -2" 
+                    radius="0.005" 
+                    height="4" 
+                    rotation="0 0 90" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.6">
+                </a-cylinder>
+                
+                <!-- 第二层连接线 -->
+                <a-cylinder 
+                    position="-2 0 -2" 
+                    radius="0.005" 
+                    height="4" 
+                    rotation="0 0 90" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.6">
+                </a-cylinder>
+                <a-cylinder 
+                    position="2 0 -2" 
+                    radius="0.005" 
+                    height="4" 
+                    rotation="0 0 90" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.6">
+                </a-cylinder>
+                
+                <!-- 第三层连接线 -->
+                <a-cylinder 
+                    position="0 -1.5 -2" 
+                    radius="0.005" 
+                    height="4" 
+                    rotation="0 0 90" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.6">
+                </a-cylinder>
+            </a-entity>
+
+            <!-- 垂直连接线 -->
+            <a-entity id="vertical-lines">
+                <!-- 左侧垂直线 -->
+                <a-cylinder 
+                    position="-4 0 -2" 
+                    radius="0.005" 
+                    height="3" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.6">
+                </a-cylinder>
+                
+                <!-- 中央垂直线 -->
+                <a-cylinder 
+                    position="0 0.75 -2" 
+                    radius="0.005" 
+                    height="1.5" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.6">
+                </a-cylinder>
+                
+                <!-- 右侧垂直线 -->
+                <a-cylinder 
+                    position="4 0 -2" 
+                    radius="0.005" 
+                    height="3" 
+                    color="#00ffff" 
+                    material="emissive: #00ffff; emissiveIntensity: 0.3; transparent: true; opacity: 0.6">
+                </a-cylinder>
+            </a-entity>
+        </a-entity>
+
+        <!-- 简化的装饰效果 (性能优化) -->
+        <a-entity id="optimized-decorations">
+            <!-- 静态边界线 -->
+            <a-torus 
+                position="0 0 -2" 
+                radius="6" 
+                radius-tubular="0.01" 
+                color="#00ffff" 
+                material="emissive: #00ffff; emissiveIntensity: 0.1; transparent: true; opacity: 0.3">
+            </a-torus>
+        </a-entity>
+
+        <!-- 信息显示面板 -->
+        <a-entity id="info-panel" position="0 -2.5 1">
+            <a-plane 
+                width="6" 
+                height="1" 
+                color="#000011" 
+                material="transparent: true; opacity: 0.8">
+            </a-plane>
+            <a-text 
+                id="interface-description" 
+                value="主菜单界面：游戏的主要入口，提供微信登录、开始游戏等核心功能。采用星空背景和全息按钮设计，营造沉浸式科幻体验。" 
+                position="0 0 0.01" 
+                align="center" 
+                color="#ffffff" 
+                width="4">
+            </a-text>
+        </a-entity>
+
+        <!-- 用户摄像头和控制器 -->
+        <a-entity id="rig" position="0 1.6 3">
+            <a-camera 
+                look-controls="pointerLockEnabled: true"
+                wasd-controls="enabled: true; acceleration: 20">
+                <!-- 准星 -->
+                <a-ring 
+                    position="0 0 -0.5" 
+                    radius-inner="0.002" 
+                    radius-outer="0.005" 
+                    color="#00ffff" 
+                    material="transparent: true; opacity: 0.8">
+                </a-ring>
+            </a-camera>
+            
+            <!-- 左手控制器 -->
+            <a-entity 
+                id="left-hand" 
+                hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 15">
+            </a-entity>
+            
+            <!-- 右手控制器 -->
+            <a-entity 
+                id="right-hand" 
+                hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 15">
+            </a-entity>
+        </a-entity>
+
+        <!-- 交互脚本 -->
+        <script>
+            // 界面数据
+            const interfaceData = {
+                1: {
+                    name: "主菜单界面",
+                    description: "游戏的主要入口，提供微信登录、开始游戏等核心功能。采用星空背景和全息按钮设计，营造沉浸式科幻体验。",
+                    features: ["星空背景设计", "全息按钮交互", "用户身份验证", "游戏模式选择"]
+                },
+                2: {
+                    name: "房间大厅界面",
+                    description: "多人组队的核心界面，支持房间创建、玩家邀请和游戏配置。环形布局展示所有玩家状态，中央显示地图预览。",
+                    features: ["环形玩家布局", "地图预览显示", "实时状态更新", "房间管理功能"]
+                },
+                3: {
+                    name: "武器装备界面",
+                    description: "武器选择和装备配置的专业界面。3D展示台展示武器模型，支持配件系统和属性对比，帮助玩家做出最佳选择。",
+                    features: ["3D武器展示", "配件系统", "属性对比", "装备预设"]
+                },
+                4: {
+                    name: "游戏内HUD界面",
+                    description: "游戏中的实时信息显示界面。包含准星系统、生命值、弹药信息、小地图等关键元素，确保玩家获得最佳战斗体验。",
+                    features: ["准星系统", "生命值显示", "小地图导航", "实时战况"]
+                },
+                5: {
+                    name: "战绩统计界面",
+                    description: "详细的数据分析和排行榜系统。3D数据图表展示个人表现，成就系统激励玩家进步，历史记录追踪成长轨迹。",
+                    features: ["3D数据图表", "成就系统", "历史记录", "排行榜"]
+                },
+                6: {
+                    name: "社交好友界面",
+                    description: "完整的社交系统界面。好友管理、战队系统、聊天功能一应俱全，支持语音和文字交流，增强团队协作体验。",
+                    features: ["在线状态", "聊天系统", "战队管理", "好友邀请"]
+                },
+                7: {
+                    name: "设置配置界面",
+                    description: "全面的系统设置界面。包含游戏设置、显示配置、控制选项等，支持个性化定制，确保最佳游戏体验。",
+                    features: ["游戏设置", "显示配置", "控制选项", "账户管理"]
+                },
+                8: {
+                    name: "教学引导界面",
+                    description: "新手训练营系统。分步骤的技能学习、实战演练和技能评估，帮助新玩家快速掌握游戏技巧，提升战斗能力。",
+                    features: ["训练课程", "实战演练", "技能评估", "进度追踪"]
+                }
+            };
+
+            let currentInterface = 1;
+            let overviewMode = false;
+
+            // 界面切换函数
+            function showInterface(interfaceId) {
+                if (overviewMode) {
+                    exitOverviewMode();
+                }
+                
+                currentInterface = interfaceId;
+                const data = interfaceData[interfaceId];
+                
+                // 隐藏所有界面
+                for (let i = 1; i <= 8; i++) {
+                    document.getElementById(`interface-${i}`).setAttribute('visible', 'false');
+                    document.getElementById(`interface-${i}`).querySelector('a-plane').setAttribute('material', 'transparent: true; opacity: 0.9; emissive: none');
+                    document.getElementById(`interface-${i}`).querySelector('a-sphere').setAttribute('color', '#666666');
+                    document.getElementById(`interface-${i}`).querySelector('a-sphere').setAttribute('material', 'emissive: #666666; emissiveIntensity: 0.3');
+                }
+                
+                // 显示当前界面
+                const currentEl = document.getElementById(`interface-${interfaceId}`);
+                currentEl.setAttribute('visible', 'true');
+                currentEl.querySelector('a-plane').setAttribute('material', 'transparent: true; opacity: 0.9; emissive: #003366; emissiveIntensity: 0.4');
+                currentEl.querySelector('a-sphere').setAttribute('color', '#00ff00');
+                currentEl.querySelector('a-sphere').setAttribute('material', 'emissive: #00ff00; emissiveIntensity: 0.8');
+                
+                // 更新信息显示
+                document.getElementById('current-interface').setAttribute('value', `当前界面：${data.name}`);
+                document.getElementById('interface-description').setAttribute('value', data.description);
+                
+                // 更新导航按钮状态
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.nav-button')[interfaceId - 1].classList.add('active');
+                
+                console.log(`切换到界面 ${interfaceId}: ${data.name}`);
+            }
+
+            // 总览模式
+            function showOverview() {
+                overviewMode = true;
+                
+                // 显示所有界面
+                for (let i = 1; i <= 8; i++) {
+                    const interfaceEl = document.getElementById(`interface-${i}`);
+                    interfaceEl.setAttribute('visible', 'true');
+                    interfaceEl.querySelector('a-plane').setAttribute('material', 'transparent: true; opacity: 0.7; emissive: #002244; emissiveIntensity: 0.2');
+                    interfaceEl.querySelector('a-sphere').setAttribute('color', '#0088ff');
+                    interfaceEl.querySelector('a-sphere').setAttribute('material', 'emissive: #0088ff; emissiveIntensity: 0.5');
+                }
+                
+                // 更新信息显示
+                document.getElementById('current-interface').setAttribute('value', '总览模式：所有界面');
+                document.getElementById('interface-description').setAttribute('value', 'MR星战大联盟包含8个核心3D空间界面，采用立体网格布局，支持WebXR技术和PICO 4UE头显。每个界面都经过精心设计，提供沉浸式的科幻体验。');
+                
+                // 更新导航按钮状态
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.nav-button')[8].classList.add('active');
+                
+                console.log('进入总览模式');
+            }
+
+            // 退出总览模式
+            function exitOverviewMode() {
+                overviewMode = false;
+                showInterface(currentInterface);
+            }
+
+            // 界面点击事件
+            document.querySelectorAll('.interface-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const interfaceId = parseInt(this.dataset.interface);
+                    showInterface(interfaceId);
+                });
+            });
+
+            // 键盘控制
+            document.addEventListener('keydown', function(event) {
+                switch(event.key) {
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                        showInterface(parseInt(event.key));
+                        break;
+                    case '0':
+                        showOverview();
+                        break;
+                    case 'ArrowLeft':
+                        if (!overviewMode) {
+                            const prevInterface = currentInterface > 1 ? currentInterface - 1 : 8;
+                            showInterface(prevInterface);
+                        }
+                        break;
+                    case 'ArrowRight':
+                        if (!overviewMode) {
+                            const nextInterface = currentInterface < 8 ? currentInterface + 1 : 1;
+                            showInterface(nextInterface);
+                        }
+                        break;
+                    case 'Escape':
+                        if (overviewMode) {
+                            exitOverviewMode();
+                        }
+                        break;
+                }
+            });
+
+            // 鼠标悬停效果
+            document.querySelectorAll('.interface-btn').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    if (!overviewMode) {
+                        const interfaceId = parseInt(this.dataset.interface);
+                        const data = interfaceData[interfaceId];
+                        document.getElementById('interface-description').setAttribute('value', `${data.name}: ${data.description}`);
+                    }
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    if (!overviewMode) {
+                        const data = interfaceData[currentInterface];
+                        document.getElementById('interface-description').setAttribute('value', data.description);
+                    }
+                });
+            });
+
+            // 自动旋转摄像头（可选）
+            let autoRotate = false;
+            function toggleAutoRotate() {
+                autoRotate = !autoRotate;
+                if (autoRotate) {
+                    const rig = document.getElementById('rig');
+                    rig.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 60000; repeat: indefinite');
+                } else {
+                    const rig = document.getElementById('rig');
+                    rig.removeAttribute('animation');
+                }
+            }
+
+            // 初始化
+            showInterface(1);
+            
+            // 性能监控
+            let frameCount = 0;
+            let lastTime = performance.now();
+            
+            function updatePerformance() {
+                frameCount++;
+                const currentTime = performance.now();
+                
+                if (currentTime - lastTime >= 1000) {
+                    const fps = Math.round(frameCount * 1000 / (currentTime - lastTime));
+                    console.log(`FPS: ${fps}`);
+                    frameCount = 0;
+                    lastTime = currentTime;
+                }
+                
+                requestAnimationFrame(updatePerformance);
+            }
+            
+            updatePerformance();
+        </script>
+    </a-scene>
+</body>
+</html>

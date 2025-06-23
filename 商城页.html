@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 商城</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .cart-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .banner {
+            margin: 0 20px 20px;
+            height: 150px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 128, 255, 0.2));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .banner-content {
+            text-align: center;
+            z-index: 2;
+        }
+        
+        .banner-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        
+        .banner-subtitle {
+            color: #00ffff;
+            font-size: 14px;
+        }
+        
+        .banner-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=150&fit=crop') center/cover;
+            opacity: 0.3;
+        }
+        
+        .categories {
+            margin: 0 20px 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .category-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        
+        .category-item.active {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .products-section {
+            margin: 0 20px 20px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 80px;
+            background: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?w=150&h=80&fit=crop') center/cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .product-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .product-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .price {
+            color: #00ffff;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .original-price {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            text-decoration: line-through;
+            margin-left: 5px;
+        }
+        
+        .buy-btn {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .stores-section {
+            margin: 0 20px 20px;
+        }
+        
+        .store-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .store-image {
+            width: 60px;
+            height: 60px;
+            background: url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=60&h=60&fit=crop') center/cover;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        .store-info {
+            flex: 1;
+        }
+        
+        .store-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .store-address {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .store-distance {
+            color: #00ffff;
+            font-size: 12px;
+        }
+        
+        .store-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .rating-stars {
+            color: #ffd700;
+            font-size: 12px;
+        }
+        
+        .rating-score {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+        
+        .promotions {
+            margin: 0 20px 100px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .promo-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .promo-item:last-child {
+            border-bottom: none;
+        }
+        
+        .promo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+        }
+        
+        .promo-content {
+            flex: 1;
+        }
+        
+        .promo-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .promo-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <div style="width: 40px;"></div>
+                <h1 class="header-title">星战商城</h1>
+                <button class="cart-btn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <div class="cart-badge">2</div>
+                </button>
+            </div>
+            
+            <!-- 横幅广告 -->
+            <div class="banner">
+                <div class="banner-bg"></div>
+                <div class="banner-content">
+                    <div class="banner-title">新手专享</div>
+                    <div class="banner-subtitle">首次充值享8折优惠</div>
+                </div>
+            </div>
+            
+            <!-- 分类导航 -->
+            <div class="categories">
+                <div class="category-item active">全部</div>
+                <div class="category-item">单人套餐</div>
+                <div class="category-item">团队套餐</div>
+                <div class="category-item">会员卡</div>
+                <div class="category-item">装备</div>
+            </div>
+            
+            <!-- 热门套餐 -->
+            <div class="products-section">
+                <h3 class="section-title">热门套餐</h3>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="product-image"></div>
+                        <div class="product-name">单人体验套餐</div>
+                        <div class="product-desc">60分钟游戏时长，适合新手体验</div>
+                        <div class="product-price">
+                            <div>
+                                <span class="price">¥68</span>
+                                <span class="original-price">¥88</span>
+                            </div>
+                            <button class="buy-btn">购买</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=150&h=80&fit=crop');"></div>
+                        <div class="product-name">双人对战套餐</div>
+                        <div class="product-desc">90分钟双人游戏，含装备租赁</div>
+                        <div class="product-price">
+                            <div>
+                                <span class="price">¥128</span>
+                                <span class="original-price">¥158</span>
+                            </div>
+                            <button class="buy-btn">购买</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=150&h=80&fit=crop');"></div>
+                        <div class="product-name">团队竞技套餐</div>
+                        <div class="product-desc">120分钟5v5团队对战</div>
+                        <div class="product-price">
+                            <div>
+                                <span class="price">¥298</span>
+                                <span class="original-price">¥358</span>
+                            </div>
+                            <button class="buy-btn">购买</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1556438064-2d7646166914?w=150&h=80&fit=crop');"></div>
+                        <div class="product-name">月度会员卡</div>
+                        <div class="product-desc">30天无限畅玩，专属特权</div>
+                        <div class="product-price">
+                            <div>
+                                <span class="price">¥199</span>
+                                <span class="original-price">¥299</span>
+                            </div>
+                            <button class="buy-btn">购买</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 附近门店 -->
+            <div class="stores-section">
+                <h3 class="section-title">附近门店</h3>
+                
+                <div class="store-item">
+                    <div class="store-image"></div>
+                    <div class="store-info">
+                        <div class="store-name">星战大联盟旗舰店</div>
+                        <div class="store-address">朝阳区三里屯太古里南区</div>
+                        <div class="store-distance">距离您 1.2km</div>
+                        <div class="store-rating">
+                            <span class="rating-stars">★★★★★</span>
+                            <span class="rating-score">4.8分</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="store-item">
+                    <div class="store-image" style="background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=60&h=60&fit=crop');"></div>
+                    <div class="store-info">
+                        <div class="store-name">星际竞技场</div>
+                        <div class="store-address">海淀区中关村创业大街</div>
+                        <div class="store-distance">距离您 2.8km</div>
+                        <div class="store-rating">
+                            <span class="rating-stars">★★★★☆</span>
+                            <span class="rating-score">4.6分</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="store-item">
+                    <div class="store-image" style="background-image: url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=60&h=60&fit=crop');"></div>
+                    <div class="store-info">
+                        <div class="store-name">未来战场体验馆</div>
+                        <div class="store-address">东城区王府井大街</div>
+                        <div class="store-distance">距离您 3.5km</div>
+                        <div class="store-rating">
+                            <span class="rating-stars">★★★★★</span>
+                            <span class="rating-score">4.9分</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 优惠活动 -->
+            <div class="promotions">
+                <h3 class="section-title">优惠活动</h3>
+                
+                <div class="promo-item">
+                    <div class="promo-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="promo-content">
+                        <div class="promo-title">新用户专享礼包</div>
+                        <div class="promo-desc">注册即送价值99元体验券</div>
+                    </div>
+                </div>
+                
+                <div class="promo-item">
+                    <div class="promo-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="promo-content">
+                        <div class="promo-title">团购优惠</div>
+                        <div class="promo-desc">3人及以上享受8.5折优惠</div>
+                    </div>
+                </div>
+                
+                <div class="promo-item">
+                    <div class="promo-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="promo-content">
+                        <div class="promo-title">限时秒杀</div>
+                        <div class="promo-desc">每日10点限量秒杀套餐</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 页面跳转函数
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        // 添加点击事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 购物车按钮
+            document.querySelector('.cart-btn').addEventListener('click', function() {
+                navigateTo('购物车页.html');
+            });
+            
+            // 横幅广告点击
+            document.querySelector('.banner').addEventListener('click', function() {
+                alert('新手专享活动详情功能待开发');
+            });
+            
+            // 分类导航
+            document.querySelectorAll('.category-item').forEach(function(item, index) {
+                item.addEventListener('click', function() {
+                    // 移除所有active类
+                    document.querySelectorAll('.category-item').forEach(function(cat) {
+                        cat.classList.remove('active');
+                    });
+                    // 添加active类到当前项
+                    this.classList.add('active');
+                    
+                    // 模拟分类筛选
+                    alert('筛选' + this.textContent + '商品功能待开发');
+                });
+            });
+            
+            // 购买按钮
+            document.querySelectorAll('.buy-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    navigateTo('支付页.html');
+                });
+            });
+            
+            // 商品卡片点击
+            document.querySelectorAll('.product-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    navigateTo('商品详情页.html');
+                });
+            });
+            
+            // 会员卡点击
+            document.querySelectorAll('.membership-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    navigateTo('会员页.html');
+                });
+            });
+            
+            // 底部导航
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('首页.html');
+            });
+            navItems[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战绩详情页.html');
+            });
+            navItems[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战队页.html');
+            });
+            navItems[4].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('个人中心页.html');
+            });
+        });
+    </script>
+</body>
+</html>

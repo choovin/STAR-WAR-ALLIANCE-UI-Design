@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 直播</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .live-btn {
+            background: linear-gradient(45deg, #e74c3c, #ec7063);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .featured-stream {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stream-video {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .stream-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .live-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .viewer-count {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .stream-info {
+            padding: 15px;
+        }
+        
+        .streamer-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .streamer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .streamer-info {
+            flex: 1;
+        }
+        
+        .streamer-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .streamer-rank {
+            color: #00ffff;
+            font-size: 12px;
+        }
+        
+        .follow-btn {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 6px 12px;
+            color: #00ffff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .stream-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .stream-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .stream-tag {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 4px 8px;
+            color: #00ffff;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .stream-categories {
+            margin: 0 20px 20px;
+        }
+        
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .category-tab {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-tab.active {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .stream-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stream-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .stream-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .stream-thumbnail {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .thumbnail-overlay {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .small-live-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: 700;
+        }
+        
+        .small-viewer-count {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+        }
+        
+        .stream-card-info {
+            padding: 10px;
+        }
+        
+        .stream-card-title {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .stream-card-streamer {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .stream-card-category {
+            color: #00ffff;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .popular-streamers {
+            margin: 0 20px 20px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            color: #00ffff;
+        }
+        
+        .streamer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .streamer-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .streamer-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .streamer-card-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            position: relative;
+        }
+        
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #2ecc71;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        .streamer-card-info {
+            flex: 1;
+        }
+        
+        .streamer-card-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .streamer-card-status {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        .streamer-card-viewers {
+            color: #00ffff;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .streamer-card-rank {
+            background: linear-gradient(45deg, #ffa500, #ffb347);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .my-streams {
+            margin: 0 20px 100px;
+        }
+        
+        .my-stream-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 12px;
+            color: #00ffff;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(45deg, #e74c3c, #ec7063);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .my-stream-history {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .history-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .history-thumbnail {
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+        
+        .history-info {
+            flex: 1;
+        }
+        
+        .history-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .history-meta {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        .history-stats {
+            color: #00ffff;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .history-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .history-btn {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 6px 10px;
+            color: #00ffff;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">游戏直播</h1>
+                <button class="live-btn">
+                    <div class="live-dot"></div>
+                    <span>开播</span>
+                </button>
+            </div>
+            
+            <!-- 精选直播 -->
+            <div class="featured-stream">
+                <div class="stream-video">
+                    <div class="play-btn">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="stream-overlay">
+                        <div class="live-badge">
+                            <div class="live-dot"></div>
+                            <span>LIVE</span>
+                        </div>
+                        <div class="viewer-count">
+                            <i class="fas fa-eye"></i>
+                            <span>1.2K</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stream-info">
+                    <div class="streamer-header">
+                        <div class="streamer-avatar">星</div>
+                        <div class="streamer-info">
+                            <div class="streamer-name">星际战神</div>
+                            <div class="streamer-rank">钻石段位</div>
+                        </div>
+                        <button class="follow-btn">关注</button>
+                    </div>
+                    <div class="stream-title">【王者挑战】冲击最强王者！今晚必上分！</div>
+                    <div class="stream-tags">
+                        <span class="stream-tag">竞技</span>
+                        <span class="stream-tag">高手</span>
+                        <span class="stream-tag">教学</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 直播分类 -->
+            <div class="stream-categories">
+                <div class="category-tabs">
+                    <div class="category-tab active">推荐</div>
+                    <div class="category-tab">竞技</div>
+                    <div class="category-tab">教学</div>
+                    <div class="category-tab">娱乐</div>
+                    <div class="category-tab">新手</div>
+                </div>
+                
+                <div class="stream-grid">
+                    <div class="stream-card">
+                        <div class="stream-thumbnail">
+                            <i class="fas fa-play text-white text-lg"></i>
+                            <div class="thumbnail-overlay">
+                                <div class="small-live-badge">LIVE</div>
+                                <div class="small-viewer-count">856</div>
+                            </div>
+                        </div>
+                        <div class="stream-card-info">
+                            <div class="stream-card-title">新手教学：从零开始的射击技巧</div>
+                            <div class="stream-card-streamer">射击教练</div>
+                            <div class="stream-card-category">教学</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stream-card">
+                        <div class="stream-thumbnail">
+                            <i class="fas fa-play text-white text-lg"></i>
+                            <div class="thumbnail-overlay">
+                                <div class="small-live-badge">LIVE</div>
+                                <div class="small-viewer-count">432</div>
+                            </div>
+                        </div>
+                        <div class="stream-card-info">
+                            <div class="stream-card-title">团队配合实战演练</div>
+                            <div class="stream-card-streamer">战术大师</div>
+                            <div class="stream-card-category">竞技</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stream-card">
+                        <div class="stream-thumbnail">
+                            <i class="fas fa-play text-white text-lg"></i>
+                            <div class="thumbnail-overlay">
+                                <div class="small-live-badge">LIVE</div>
+                                <div class="small-viewer-count">298</div>
+                            </div>
+                        </div>
+                        <div class="stream-card-info">
+                            <div class="stream-card-title">搞笑时刻合集</div>
+                            <div class="stream-card-streamer">欢乐射手</div>
+                            <div class="stream-card-category">娱乐</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stream-card">
+                        <div class="stream-thumbnail">
+                            <i class="fas fa-play text-white text-lg"></i>
+                            <div class="thumbnail-overlay">
+                                <div class="small-live-badge">LIVE</div>
+                                <div class="small-viewer-count">167</div>
+                            </div>
+                        </div>
+                        <div class="stream-card-info">
+                            <div class="stream-card-title">装备评测与推荐</div>
+                            <div class="stream-card-streamer">装备专家</div>
+                            <div class="stream-card-category">教学</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 热门主播 -->
+            <div class="popular-streamers">
+                <h3 class="section-title">
+                    <i class="fas fa-star section-icon"></i>
+                    热门主播
+                </h3>
+                
+                <div class="streamer-list">
+                    <div class="streamer-card">
+                        <div class="streamer-card-avatar">
+                            王
+                            <div class="online-indicator"></div>
+                        </div>
+                        <div class="streamer-card-info">
+                            <div class="streamer-card-name">王者归来</div>
+                            <div class="streamer-card-status">正在直播：巅峰对决</div>
+                            <div class="streamer-card-viewers">2.3K 观众</div>
+                        </div>
+                        <div class="streamer-card-rank">王者</div>
+                    </div>
+                    
+                    <div class="streamer-card">
+                        <div class="streamer-card-avatar">
+                            神
+                            <div class="online-indicator"></div>
+                        </div>
+                        <div class="streamer-card-info">
+                            <div class="streamer-card-name">神枪手</div>
+                            <div class="streamer-card-status">正在直播：精准训练</div>
+                            <div class="streamer-card-viewers">1.8K 观众</div>
+                        </div>
+                        <div class="streamer-card-rank">钻石</div>
+                    </div>
+                    
+                    <div class="streamer-card">
+                        <div class="streamer-card-avatar">
+                            影
+                            <div class="online-indicator"></div>
+                        </div>
+                        <div class="streamer-card-info">
+                            <div class="streamer-card-name">影子杀手</div>
+                            <div class="streamer-card-status">正在直播：潜行技巧</div>
+                            <div class="streamer-card-viewers">1.5K 观众</div>
+                        </div>
+                        <div class="streamer-card-rank">钻石</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 我的直播 -->
+            <div class="my-streams">
+                <h3 class="section-title">
+                    <i class="fas fa-video section-icon"></i>
+                    我的直播
+                </h3>
+                
+                <div class="my-stream-actions">
+                    <button class="action-btn primary">
+                        <i class="fas fa-video"></i>
+                        <span>开始直播</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-cog"></i>
+                        <span>直播设置</span>
+                    </button>
+                </div>
+                
+                <div class="my-stream-history">
+                    <div class="history-card">
+                        <div class="history-thumbnail">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">昨日精彩回放</div>
+                            <div class="history-meta">2024-01-15 20:30 · 2小时</div>
+                            <div class="history-stats">最高856人观看 · 获得128个赞</div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="history-btn">回放</button>
+                            <button class="history-btn">分享</button>
+                        </div>
+                    </div>
+                    
+                    <div class="history-card">
+                        <div class="history-thumbnail">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">新手教学直播</div>
+                            <div class="history-meta">2024-01-14 19:00 · 1.5小时</div>
+                            <div class="history-stats">最高432人观看 · 获得89个赞</div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="history-btn">回放</button>
+                            <button class="history-btn">分享</button>
+                        </div>
+                    </div>
+                    
+                    <div class="history-card">
+                        <div class="history-thumbnail">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">团队训练实况</div>
+                            <div class="history-meta">2024-01-13 21:00 · 3小时</div>
+                            <div class="history-stats">最高298人观看 · 获得67个赞</div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="history-btn">回放</button>
+                            <button class="history-btn">分享</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 页面跳转函数
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        // 添加点击事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮
+            document.querySelector('.back-btn').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 精选直播卡片点击
+            document.querySelectorAll('.featured-stream').forEach(function(stream) {
+                stream.addEventListener('click', function() {
+                    const title = this.querySelector('.stream-title').textContent;
+                    alert('进入直播间：' + title);
+                    // navigateTo('直播间页.html?stream=' + encodeURIComponent(title));
+                });
+            });
+            
+            // 直播卡片点击
+            document.querySelectorAll('.stream-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const title = this.querySelector('.stream-title').textContent;
+                    alert('进入直播间：' + title);
+                    // navigateTo('直播间页.html?stream=' + encodeURIComponent(title));
+                });
+            });
+            
+            // 主播卡片点击
+            document.querySelectorAll('.streamer-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const name = this.querySelector('.streamer-card-name').textContent;
+                    alert('查看主播：' + name + ' 的个人主页');
+                    // navigateTo('主播主页.html?streamer=' + encodeURIComponent(name));
+                });
+            });
+            
+            // 开始直播按钮
+            document.querySelector('.start-stream-btn').addEventListener('click', function() {
+                alert('开始直播功能待开发');
+                // navigateTo('开始直播页.html');
+            });
+            
+            // 直播设置按钮
+            document.querySelector('.stream-settings-btn').addEventListener('click', function() {
+                alert('直播设置功能待开发');
+                // navigateTo('直播设置页.html');
+            });
+            
+            // 历史记录卡片点击
+            document.querySelectorAll('.history-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const title = this.querySelector('.history-title').textContent;
+                    alert('查看直播回放：' + title);
+                    // navigateTo('直播回放页.html?history=' + encodeURIComponent(title));
+                });
+            });
+            
+            // 分类标签点击
+            document.querySelectorAll('.category-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    // 移除所有active类
+                    document.querySelectorAll('.category-item').forEach(function(cat) {
+                        cat.classList.remove('active');
+                    });
+                    // 添加active类到当前项
+                    this.classList.add('active');
+                    
+                    const category = this.textContent;
+                    alert('筛选' + category + '直播功能待开发');
+                });
+            });
+            
+            // 底部导航
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('首页.html');
+            });
+            navItems[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战绩详情页.html');
+            });
+            navItems[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战队页.html');
+            });
+            navItems[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('商城页.html');
+            });
+            navItems[4].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('个人中心页.html');
+            });
+        });
+    </script>
+</body>
+</html>

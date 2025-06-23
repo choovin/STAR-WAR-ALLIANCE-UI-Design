@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 个人中心</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .settings-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+        }
+        
+        .profile-header {
+            margin: 0 20px 30px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 128, 255, 0.1));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 auto 15px;
+            position: relative;
+            border: 3px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .avatar-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #ffa500, #ffb347);
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+        
+        .profile-name {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-id {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .profile-rank {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #ffa500, #ffb347);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            color: #00ffff;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+        
+        .quick-actions {
+            margin: 0 20px 30px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            color: #00ffff;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .action-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            margin: 0 auto 10px;
+        }
+        
+        .action-label {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .menu-sections {
+            margin: 0 20px 100px;
+        }
+        
+        .menu-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            font-size: 16px;
+        }
+        
+        .menu-content {
+            flex: 1;
+        }
+        
+        .menu-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .menu-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .menu-arrow {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+        }
+        
+        .menu-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+        
+        .menu-switch {
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-switch.active {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+        }
+        
+        .switch-thumb {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-switch.active .switch-thumb {
+            transform: translateX(20px);
+        }
+        
+        .vip-banner {
+            margin: 0 20px 20px;
+            background: linear-gradient(135deg, #ffa500, #ffb347);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .vip-banner:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+        }
+        
+        .vip-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .vip-content {
+            flex: 1;
+        }
+        
+        .vip-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .vip-desc {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+        }
+        
+        .vip-arrow {
+            color: white;
+            font-size: 16px;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <div style="width: 40px;"></div>
+                <h1 class="header-title">个人中心</h1>
+                <button class="settings-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            
+            <!-- 个人信息 -->
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    星
+                    <div class="avatar-badge">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                </div>
+                <div class="profile-name">星际战神</div>
+                <div class="profile-id">ID: SW2024001</div>
+                <div class="profile-rank">
+                    <i class="fas fa-medal"></i>
+                    <span>钻石段位</span>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">总场次</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">78%</div>
+                        <div class="stat-label">胜率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2.8</div>
+                        <div class="stat-label">K/D</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- VIP横幅 -->
+            <div class="vip-banner">
+                <div class="vip-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="vip-content">
+                    <div class="vip-title">升级VIP会员</div>
+                    <div class="vip-desc">享受专属特权，解锁更多功能</div>
+                </div>
+                <div class="vip-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <h3 class="section-title">
+                    <i class="fas fa-bolt section-icon"></i>
+                    快捷操作
+                </h3>
+                
+                <div class="action-grid">
+                    <div class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="action-label">我的钱包</div>
+                    </div>
+                    
+                    <div class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="action-label">优惠券</div>
+                    </div>
+                    
+                    <div class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="action-label">历史记录</div>
+                    </div>
+                    
+                    <div class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="action-label">我的收藏</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 菜单选项 -->
+            <div class="menu-sections">
+                <!-- 游戏相关 -->
+                <div class="menu-section">
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">数据统计</div>
+                            <div class="menu-subtitle">查看详细战绩分析</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">成就中心</div>
+                            <div class="menu-subtitle">查看获得的成就和徽章</div>
+                        </div>
+                        <div class="menu-badge">3</div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">我的战队</div>
+                            <div class="menu-subtitle">管理战队信息</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">训练记录</div>
+                            <div class="menu-subtitle">查看训练历史和进度</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 商城相关 -->
+                <div class="menu-section">
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">我的订单</div>
+                            <div class="menu-subtitle">查看购买记录</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">积分商城</div>
+                            <div class="menu-subtitle">使用积分兑换奖励</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">我的预约</div>
+                            <div class="menu-subtitle">管理游戏预约</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 社交相关 -->
+                <div class="menu-section">
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">好友管理</div>
+                            <div class="menu-subtitle">管理好友列表</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">分享中心</div>
+                            <div class="menu-subtitle">分享战绩和动态</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">直播中心</div>
+                            <div class="menu-subtitle">管理直播设置</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 设置相关 -->
+                <div class="menu-section">
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">消息通知</div>
+                            <div class="menu-subtitle">管理通知设置</div>
+                        </div>
+                        <div class="menu-switch active">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">隐私设置</div>
+                            <div class="menu-subtitle">管理隐私权限</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">帮助中心</div>
+                            <div class="menu-subtitle">常见问题和客服</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-title">关于我们</div>
+                            <div class="menu-subtitle">版本信息和团队介绍</div>
+                        </div>
+                        <div class="menu-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 页面跳转函数
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        // 添加点击事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置按钮
+            document.querySelector('.settings-btn').addEventListener('click', function() {
+                navigateTo('设置页.html');
+            });
+            
+            // VIP横幅点击
+            document.querySelector('.vip-banner').addEventListener('click', function() {
+                navigateTo('会员页.html');
+            });
+            
+            // 快捷操作
+            const actionItems = document.querySelectorAll('.action-item');
+            actionItems[0].addEventListener('click', function() {
+                navigateTo('钱包页.html');
+            });
+            actionItems[1].addEventListener('click', function() {
+                navigateTo('优惠券页.html');
+            });
+            actionItems[2].addEventListener('click', function() {
+                alert('历史记录功能待开发');
+            });
+            actionItems[3].addEventListener('click', function() {
+                alert('我的收藏功能待开发');
+            });
+            
+            // 菜单项点击
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(function(item, index) {
+                item.addEventListener('click', function() {
+                    const title = this.querySelector('.menu-title').textContent;
+                    switch(title) {
+                        case '数据统计':
+                            navigateTo('战绩详情页.html');
+                            break;
+                        case '成就中心':
+                            navigateTo('成就页.html');
+                            break;
+                        case '我的战队':
+                            navigateTo('战队页.html');
+                            break;
+                        case '训练记录':
+                            navigateTo('训练页.html');
+                            break;
+                        case '我的订单':
+                            navigateTo('订单页.html');
+                            break;
+                        case '积分商城':
+                            navigateTo('积分商城页.html');
+                            break;
+                        case '预约记录':
+                            navigateTo('预约页.html');
+                            break;
+                        case '好友列表':
+                            navigateTo('好友页.html');
+                            break;
+                        case '分享赚积分':
+                            navigateTo('分享页.html');
+                            break;
+                        case '直播中心':
+                            navigateTo('直播页.html');
+                            break;
+                        case '消息通知':
+                            navigateTo('消息页.html');
+                            break;
+                        case '隐私设置':
+                            navigateTo('设置页.html');
+                            break;
+                        case '帮助中心':
+                            alert('帮助中心功能待开发');
+                            break;
+                        case '关于我们':
+                            alert('关于我们功能待开发');
+                            break;
+                        default:
+                            alert(title + '功能待开发');
+                    }
+                });
+            });
+            
+            // 底部导航
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('首页.html');
+            });
+            navItems[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战绩详情页.html');
+            });
+            navItems[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战队页.html');
+            });
+            navItems[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('商城页.html');
+            });
+            // navItems[4] 是当前页面，不需要添加点击事件
+        });
+    </script>
+</body>
+</html>

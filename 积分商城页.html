@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 积分商城</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .points-info {
+            margin: 0 20px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 128, 255, 0.1));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .points-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .points-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .points-history {
+            color: #00ffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .points-balance {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .points-amount {
+            color: #00ffff;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .points-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        
+        .points-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .points-btn {
+            flex: 1;
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 10px;
+            color: #00ffff;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .points-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+        }
+        
+        .categories {
+            margin: 0 20px 20px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            padding: 5px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        .category-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-tab.active {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+        }
+        
+        .products-container {
+            margin: 0 20px 100px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            color: #00ffff;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .product-icon {
+            color: white;
+            font-size: 24px;
+        }
+        
+        .hot-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(45deg, #ff4444, #ff6666);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .limited-badge {
+            background: linear-gradient(45deg, #ffa500, #ffb347);
+        }
+        
+        .product-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+        
+        .product-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .price-points {
+            color: #00ffff;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .price-icon {
+            font-size: 12px;
+        }
+        
+        .exchange-btn {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 5px 10px;
+            color: #00ffff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .exchange-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+        }
+        
+        .exchange-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+        
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .product-card-horizontal {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .product-card-horizontal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .product-image-small {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .product-tags {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+        
+        .product-tag {
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .stock-info {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .stock-low {
+            color: #ff6666;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">积分商城</h1>
+                <div style="width: 40px;"></div>
+            </div>
+            
+            <!-- 积分信息 -->
+            <div class="points-info">
+                <div class="points-header">
+                    <div class="points-title">我的积分</div>
+                    <div class="points-history">
+                        <i class="fas fa-history"></i> 积分记录
+                    </div>
+                </div>
+                <div class="points-balance">
+                    <div class="points-amount">2,580</div>
+                    <div class="points-label">可用积分</div>
+                </div>
+                <div class="points-actions">
+                    <div class="points-btn">
+                        <i class="fas fa-gamepad"></i> 游戏获取
+                    </div>
+                    <div class="points-btn">
+                        <i class="fas fa-tasks"></i> 任务获取
+                    </div>
+                    <div class="points-btn">
+                        <i class="fas fa-gift"></i> 签到获取
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 分类标签 -->
+            <div class="categories">
+                <div class="category-tab active">热门</div>
+                <div class="category-tab">装备</div>
+                <div class="category-tab">道具</div>
+                <div class="category-tab">皮肤</div>
+            </div>
+            
+            <!-- 商品列表 -->
+            <div class="products-container">
+                <!-- 热门推荐 -->
+                <h3 class="section-title">
+                    <i class="fas fa-fire section-icon"></i>
+                    热门推荐
+                </h3>
+                
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-crosshairs product-icon"></i>
+                            <div class="hot-badge">HOT</div>
+                        </div>
+                        <div class="product-name">精准瞄准镜</div>
+                        <div class="product-desc">提升瞄准精度15%</div>
+                        <div class="product-price">
+                            <div class="price-points">
+                                <i class="fas fa-coins price-icon"></i>
+                                500
+                            </div>
+                            <button class="exchange-btn">兑换</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-shield-alt product-icon"></i>
+                            <div class="hot-badge">HOT</div>
+                        </div>
+                        <div class="product-name">防护护甲</div>
+                        <div class="product-desc">减少伤害20%</div>
+                        <div class="product-price">
+                            <div class="price-points">
+                                <i class="fas fa-coins price-icon"></i>
+                                800
+                            </div>
+                            <button class="exchange-btn">兑换</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-bolt product-icon"></i>
+                            <div class="limited-badge">限时</div>
+                        </div>
+                        <div class="product-name">能量提升器</div>
+                        <div class="product-desc">增加移动速度25%</div>
+                        <div class="product-price">
+                            <div class="price-points">
+                                <i class="fas fa-coins price-icon"></i>
+                                1200
+                            </div>
+                            <button class="exchange-btn">兑换</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-heart product-icon"></i>
+                        </div>
+                        <div class="product-name">生命药剂</div>
+                        <div class="product-desc">瞬间恢复50%血量</div>
+                        <div class="product-price">
+                            <div class="price-points">
+                                <i class="fas fa-coins price-icon"></i>
+                                300
+                            </div>
+                            <button class="exchange-btn">兑换</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 限时特惠 -->
+                <h3 class="section-title">
+                    <i class="fas fa-clock section-icon"></i>
+                    限时特惠
+                </h3>
+                
+                <div class="product-list">
+                    <div class="product-card-horizontal">
+                        <div class="product-image-small">
+                            <i class="fas fa-gem product-icon"></i>
+                            <div class="limited-badge">限时</div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <div class="product-name">钻石皮肤礼包</div>
+                                <div class="price-points">
+                                    <i class="fas fa-coins price-icon"></i>
+                                    1500
+                                </div>
+                            </div>
+                            <div class="product-tags">
+                                <div class="product-tag">限时</div>
+                                <div class="product-tag">稀有</div>
+                            </div>
+                            <div class="product-desc">包含5款钻石级武器皮肤</div>
+                            <div class="stock-info">剩余时间: 23:45:12</div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-horizontal">
+                        <div class="product-image-small">
+                            <i class="fas fa-trophy product-icon"></i>
+                            <div class="limited-badge">限时</div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <div class="product-name">荣耀称号</div>
+                                <div class="price-points">
+                                    <i class="fas fa-coins price-icon"></i>
+                                    2000
+                                </div>
+                            </div>
+                            <div class="product-tags">
+                                <div class="product-tag">限时</div>
+                                <div class="product-tag">专属</div>
+                            </div>
+                            <div class="product-desc">"星际战神"专属称号</div>
+                            <div class="stock-info stock-low">仅剩 3 个</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 游戏道具 -->
+                <h3 class="section-title">
+                    <i class="fas fa-magic section-icon"></i>
+                    游戏道具
+                </h3>
+                
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-eye product-icon"></i>
+                        </div>
+                        <div class="product-name">透视眼镜</div>
+                        <div class="product-desc">短时间内看穿障碍物</div>
+                        <div class="product-price">
+                            <div class="price-points">
+                                <i class="fas fa-coins price-icon"></i>
+                                600
+                            </div>
+                            <button class="exchange-btn">兑换</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-bomb product-icon"></i>
+                        </div>
+                        <div class="product-name">爆炸手雷</div>
+                        <div class="product-desc">范围伤害武器</div>
+                        <div class="product-price">
+                            <div class="price-points">
+                                <i class="fas fa-coins price-icon"></i>
+                                400
+                            </div>
+                            <button class="exchange-btn">兑换</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-clock product-icon"></i>
+                        </div>
+                        <div class="product-name">时间减缓器</div>
+                        <div class="product-desc">减缓敌人移动速度</div>
+                        <div class="product-price">
+                            <div class="price-points">
+                                <i class="fas fa-coins price-icon"></i>
+                                900
+                            </div>
+                            <button class="exchange-btn" disabled>积分不足</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-rocket product-icon"></i>
+                        </div>
+                        <div class="product-name">火箭推进器</div>
+                        <div class="product-desc">快速移动到指定位置</div>
+                        <div class="product-price">
+                            <div class="price-points">
+                                <i class="fas fa-coins price-icon"></i>
+                                700
+                            </div>
+                            <button class="exchange-btn">兑换</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 实物奖励 -->
+                <h3 class="section-title">
+                    <i class="fas fa-gift section-icon"></i>
+                    实物奖励
+                </h3>
+                
+                <div class="product-list">
+                    <div class="product-card-horizontal">
+                        <div class="product-image-small">
+                            <i class="fas fa-tshirt product-icon"></i>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <div class="product-name">星战联盟T恤</div>
+                                <div class="price-points">
+                                    <i class="fas fa-coins price-icon"></i>
+                                    3000
+                                </div>
+                            </div>
+                            <div class="product-tags">
+                                <div class="product-tag">实物</div>
+                                <div class="product-tag">包邮</div>
+                            </div>
+                            <div class="product-desc">官方限量版T恤，多种尺码可选</div>
+                            <div class="stock-info">库存充足</div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-horizontal">
+                        <div class="product-image-small">
+                            <i class="fas fa-mouse product-icon"></i>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <div class="product-name">游戏鼠标</div>
+                                <div class="price-points">
+                                    <i class="fas fa-coins price-icon"></i>
+                                    5000
+                                </div>
+                            </div>
+                            <div class="product-tags">
+                                <div class="product-tag">实物</div>
+                                <div class="product-tag">高端</div>
+                            </div>
+                            <div class="product-desc">专业电竞鼠标，RGB灯效</div>
+                            <div class="stock-info stock-low">仅剩 5 个</div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-horizontal">
+                        <div class="product-image-small">
+                            <i class="fas fa-headphones product-icon"></i>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <div class="product-name">游戏耳机</div>
+                                <div class="price-points">
+                                    <i class="fas fa-coins price-icon"></i>
+                                    4500
+                                </div>
+                            </div>
+                            <div class="product-tags">
+                                <div class="product-tag">实物</div>
+                                <div class="product-tag">7.1声道</div>
+                            </div>
+                            <div class="product-desc">7.1环绕声游戏耳机</div>
+                            <div class="stock-info">库存充足</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮
+            document.querySelector('.back-btn').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 积分记录按钮
+            document.querySelector('.points-history').addEventListener('click', function() {
+                alert('积分记录功能待开发');
+            });
+            
+            // 积分获取按钮
+            document.querySelectorAll('.points-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const btnText = this.textContent.trim();
+                    alert(btnText + '功能待开发');
+                });
+            });
+            
+            // 分类标签切换
+            document.querySelectorAll('.category-tab').forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    // 移除所有active类
+                    document.querySelectorAll('.category-tab').forEach(function(t) {
+                        t.classList.remove('active');
+                    });
+                    // 添加active类到当前标签
+                    this.classList.add('active');
+                    
+                    const category = this.textContent;
+                    alert('切换到' + category + '分类');
+                    
+                    // 这里可以添加筛选商品的逻辑
+                    filterProducts(category);
+                });
+            });
+            
+            // 商品兑换按钮
+            document.querySelectorAll('.exchange-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const productCard = this.closest('.product-card, .product-card-horizontal');
+                    const productName = productCard.querySelector('.product-name').textContent;
+                    const priceElement = productCard.querySelector('.price-points');
+                    const price = priceElement.textContent.trim();
+                    
+                    const confirmed = confirm('确认兑换「' + productName + '」？\n需要消耗：' + price + '积分');
+                    
+                    if (confirmed) {
+                        // 模拟兑换过程
+                        this.textContent = '兑换中...';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            alert('兑换成功！「' + productName + '」已添加到您的背包');
+                            this.textContent = '已兑换';
+                            this.style.background = '#666';
+                            
+                            // 更新积分余额（模拟）
+                            updatePointsBalance();
+                        }, 1500);
+                    }
+                });
+            });
+            
+            // 商品卡片点击（查看详情）
+            document.querySelectorAll('.product-card, .product-card-horizontal').forEach(function(card) {
+                card.addEventListener('click', function(e) {
+                    // 如果点击的是兑换按钮，不触发卡片点击
+                    if (e.target.classList.contains('exchange-btn')) {
+                        return;
+                    }
+                    
+                    const productName = this.querySelector('.product-name').textContent;
+                    alert('查看商品详情：' + productName);
+                });
+            });
+            
+            // 底部导航
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '首页.html';
+            });
+            navItems[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '战绩详情页.html';
+            });
+            navItems[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '战队页.html';
+            });
+            navItems[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '商城页.html';
+            });
+            navItems[4].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '个人中心页.html';
+            });
+        });
+        
+        // 筛选商品函数
+        function filterProducts(category) {
+            const productCards = document.querySelectorAll('.product-card, .product-card-horizontal');
+            
+            productCards.forEach(function(card) {
+                if (category === '全部') {
+                    card.style.display = 'block';
+                } else {
+                    // 这里可以根据商品的分类属性来筛选
+                    // 暂时显示所有商品
+                    card.style.display = 'block';
+                }
+            });
+        }
+        
+        // 更新积分余额
+        function updatePointsBalance() {
+            const pointsAmount = document.querySelector('.points-amount');
+            let currentPoints = parseInt(pointsAmount.textContent.replace(',', ''));
+            // 模拟扣除积分
+            currentPoints -= 100;
+            pointsAmount.textContent = currentPoints.toLocaleString();
+        }
+    </script>
+</body>
+</html>

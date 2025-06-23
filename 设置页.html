@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 设置</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .settings-sections {
+            margin: 0 20px 100px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title:first-child {
+            margin-top: 0;
+        }
+        
+        .section-icon {
+            color: #00ffff;
+        }
+        
+        .settings-group {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .setting-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .setting-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            font-size: 16px;
+        }
+        
+        .setting-content {
+            flex: 1;
+        }
+        
+        .setting-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .setting-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .setting-value {
+            color: #00ffff;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .setting-arrow {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+        }
+        
+        .setting-switch {
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .setting-switch.active {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+        }
+        
+        .switch-thumb {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .setting-switch.active .switch-thumb {
+            transform: translateX(20px);
+        }
+        
+        .setting-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+        
+        .setting-slider {
+            width: 100px;
+            margin-right: 10px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            cursor: pointer;
+            border: none;
+        }
+        
+        .account-info {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 128, 255, 0.1));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .account-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .account-details {
+            flex: 1;
+        }
+        
+        .account-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .account-id {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .account-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(45deg, #2ecc71, #58d68d);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .edit-btn {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 8px 12px;
+            color: #00ffff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .danger-zone {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            border-radius: 20px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        
+        .danger-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(231, 76, 60, 0.2);
+        }
+        
+        .danger-item:last-child {
+            border-bottom: none;
+        }
+        
+        .danger-item:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        
+        .danger-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(231, 76, 60, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e74c3c;
+            font-size: 16px;
+        }
+        
+        .danger-title {
+            color: #e74c3c;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .danger-subtitle {
+            color: rgba(231, 76, 60, 0.8);
+            font-size: 12px;
+        }
+        
+        .version-info {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+        }
+        
+        .version-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .version-number {
+            color: #00ffff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">设置</h1>
+                <div style="width: 40px;"></div>
+            </div>
+            
+            <div class="settings-sections">
+                <!-- 账户信息 -->
+                <div class="account-info">
+                    <div class="account-avatar">星</div>
+                    <div class="account-details">
+                        <div class="account-name">星际战神</div>
+                        <div class="account-id">ID: SW2024001</div>
+                        <div class="account-status">
+                            <i class="fas fa-check-circle"></i>
+                            <span>已认证</span>
+                        </div>
+                    </div>
+                    <button class="edit-btn">编辑</button>
+                </div>
+                
+                <!-- 通知设置 -->
+                <h3 class="section-title">
+                    <i class="fas fa-bell section-icon"></i>
+                    通知设置
+                </h3>
+                
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">推送通知</div>
+                            <div class="setting-subtitle">接收游戏和活动通知</div>
+                        </div>
+                        <div class="setting-switch active">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">成就通知</div>
+                            <div class="setting-subtitle">获得新成就时提醒</div>
+                        </div>
+                        <div class="setting-switch active">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">好友通知</div>
+                            <div class="setting-subtitle">好友上线和邀请通知</div>
+                        </div>
+                        <div class="setting-switch">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">消息通知</div>
+                            <div class="setting-subtitle">聊天消息提醒</div>
+                        </div>
+                        <div class="setting-switch active">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 游戏设置 -->
+                <h3 class="section-title">
+                    <i class="fas fa-gamepad section-icon"></i>
+                    游戏设置
+                </h3>
+                
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">音效音量</div>
+                            <div class="setting-subtitle">调节游戏音效大小</div>
+                        </div>
+                        <div class="setting-slider">
+                            <input type="range" min="0" max="100" value="75" class="slider">
+                        </div>
+                        <div class="setting-value">75%</div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">背景音乐</div>
+                            <div class="setting-subtitle">调节背景音乐音量</div>
+                        </div>
+                        <div class="setting-slider">
+                            <input type="range" min="0" max="100" value="50" class="slider">
+                        </div>
+                        <div class="setting-value">50%</div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">震动反馈</div>
+                            <div class="setting-subtitle">射击时震动提醒</div>
+                        </div>
+                        <div class="setting-switch active">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">画质设置</div>
+                            <div class="setting-subtitle">选择画质等级</div>
+                        </div>
+                        <div class="setting-value">高清</div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 隐私设置 -->
+                <h3 class="section-title">
+                    <i class="fas fa-shield-alt section-icon"></i>
+                    隐私设置
+                </h3>
+                
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">隐身模式</div>
+                            <div class="setting-subtitle">不显示在线状态</div>
+                        </div>
+                        <div class="setting-switch">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">战绩公开</div>
+                            <div class="setting-subtitle">允许他人查看战绩</div>
+                        </div>
+                        <div class="setting-switch active">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">好友申请</div>
+                            <div class="setting-subtitle">允许陌生人添加好友</div>
+                        </div>
+                        <div class="setting-switch active">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">位置信息</div>
+                            <div class="setting-subtitle">分享位置给好友</div>
+                        </div>
+                        <div class="setting-switch">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 其他设置 -->
+                <h3 class="section-title">
+                    <i class="fas fa-cog section-icon"></i>
+                    其他设置
+                </h3>
+                
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">语言设置</div>
+                            <div class="setting-subtitle">选择界面语言</div>
+                        </div>
+                        <div class="setting-value">简体中文</div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">网络设置</div>
+                            <div class="setting-subtitle">选择网络连接方式</div>
+                        </div>
+                        <div class="setting-value">自动</div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">自动更新</div>
+                            <div class="setting-subtitle">自动下载应用更新</div>
+                        </div>
+                        <div class="setting-switch active">
+                            <div class="switch-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">缓存管理</div>
+                            <div class="setting-subtitle">清理应用缓存数据</div>
+                        </div>
+                        <div class="setting-value">256MB</div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 帮助与支持 -->
+                <h3 class="section-title">
+                    <i class="fas fa-question-circle section-icon"></i>
+                    帮助与支持
+                </h3>
+                
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">使用帮助</div>
+                            <div class="setting-subtitle">查看使用说明</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">联系客服</div>
+                            <div class="setting-subtitle">获取技术支持</div>
+                        </div>
+                        <div class="setting-badge">1</div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">问题反馈</div>
+                            <div class="setting-subtitle">报告Bug或建议</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="setting-title">评价应用</div>
+                            <div class="setting-subtitle">在应用商店评分</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 危险操作 -->
+                <div class="danger-zone">
+                    <div class="danger-item">
+                        <div class="danger-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="danger-title">退出登录</div>
+                            <div class="danger-subtitle">退出当前账户</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="danger-item">
+                        <div class="danger-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <div class="setting-content">
+                            <div class="danger-title">删除账户</div>
+                            <div class="danger-subtitle">永久删除账户和数据</div>
+                        </div>
+                        <div class="setting-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 版本信息 -->
+                <div class="version-info">
+                    <div class="version-text">星战大联盟</div>
+                    <div class="version-number">版本 1.0.0</div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮
+            document.querySelector('.back-btn').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 账户编辑按钮
+            document.querySelector('.edit-btn').addEventListener('click', function() {
+                alert('编辑个人资料功能待开发');
+            });
+            
+            // 设置开关切换
+            document.querySelectorAll('.setting-switch').forEach(function(switchEl) {
+                switchEl.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    
+                    const settingItem = this.closest('.setting-item');
+                    const settingTitle = settingItem.querySelector('.setting-title').textContent;
+                    const isActive = this.classList.contains('active');
+                    
+                    alert(settingTitle + '已' + (isActive ? '开启' : '关闭'));
+                });
+            });
+            
+            // 滑块调节
+            document.querySelectorAll('.slider').forEach(function(slider) {
+                slider.addEventListener('input', function() {
+                    const value = this.value;
+                    const settingItem = this.closest('.setting-item');
+                    const valueDisplay = settingItem.querySelector('.setting-value');
+                    const settingTitle = settingItem.querySelector('.setting-title').textContent;
+                    
+                    valueDisplay.textContent = value + '%';
+                    
+                    // 可以在这里添加实际的音量调节逻辑
+                    console.log(settingTitle + '调节为：' + value + '%');
+                });
+            });
+            
+            // 设置项点击
+            document.querySelectorAll('.setting-item').forEach(function(item) {
+                // 排除已有特殊处理的项目
+                if (!item.querySelector('.setting-switch') && !item.querySelector('.slider')) {
+                    item.addEventListener('click', function() {
+                        const settingTitle = this.querySelector('.setting-title').textContent;
+                        alert(settingTitle + '功能待开发');
+                    });
+                }
+            });
+            
+            // 底部导航
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '首页.html';
+            });
+            navItems[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '战绩详情页.html';
+            });
+            navItems[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '战队页.html';
+            });
+            navItems[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '商城页.html';
+            });
+            navItems[4].addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '个人中心页.html';
+            });
+        });
+    </script>
+</body>
+</html>

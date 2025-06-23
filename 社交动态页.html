@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 社交动态</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .post-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .filter-tabs {
+            margin: 0 20px 20px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            padding: 5px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        .filter-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .filter-tab.active {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+        }
+        
+        .posts-container {
+            margin: 0 20px 100px;
+        }
+        
+        .post-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .post-time {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .post-menu {
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+        }
+        
+        .post-content {
+            margin-bottom: 15px;
+        }
+        
+        .post-text {
+            color: white;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        
+        .post-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        
+        .post-tag {
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .post-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .post-image {
+            aspect-ratio: 1;
+            border-radius: 15px;
+            background: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?w=150&h=150&fit=crop') center/cover;
+        }
+        
+        .battle-stats {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stats-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .stats-icon {
+            color: #00ffff;
+        }
+        
+        .stats-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            color: #00ffff;
+            font-size: 18px;
+            font-weight: 900;
+            margin-bottom: 2px;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-group {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn.liked {
+            color: #ff4444;
+        }
+        
+        .action-btn:hover {
+            color: #00ffff;
+        }
+        
+        .share-btn {
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .share-btn:hover {
+            color: #00ffff;
+        }
+        
+        .team-post {
+            border-left: 4px solid #00ffff;
+        }
+        
+        .team-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .team-logo {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        
+        .team-name {
+            color: #00ffff;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .rank-badge {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <div style="width: 40px;"></div>
+                <h1 class="header-title">社交动态</h1>
+                <button class="post-btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <!-- 筛选标签 -->
+            <div class="filter-tabs">
+                <div class="filter-tab active">全部</div>
+                <div class="filter-tab">关注</div>
+                <div class="filter-tab">战队</div>
+                <div class="filter-tab">热门</div>
+            </div>
+            
+            <!-- 动态列表 -->
+            <div class="posts-container">
+                <!-- 个人战绩分享 -->
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="user-avatar">星</div>
+                        <div class="user-info">
+                            <div class="user-name">星际战士</div>
+                            <div class="post-time">2小时前</div>
+                        </div>
+                        <i class="fas fa-ellipsis-h post-menu"></i>
+                    </div>
+                    
+                    <div class="post-content">
+                        <div class="post-text">今天的表现超级棒！连续5局胜利，K/D比达到了新高度 🔥</div>
+                        
+                        <div class="post-tags">
+                            <span class="post-tag">#连胜</span>
+                            <span class="post-tag">#MVP</span>
+                            <span class="post-tag">#个人最佳</span>
+                        </div>
+                        
+                        <div class="battle-stats">
+                            <div class="stats-header">
+                                <i class="fas fa-trophy stats-icon"></i>
+                                <span class="stats-title">今日战绩</span>
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-value">5</div>
+                                    <div class="stat-label">胜利</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">3.2</div>
+                                    <div class="stat-label">K/D</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">89</div>
+                                    <div class="stat-label">击杀</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-badge">
+                            <i class="fas fa-medal"></i>
+                            获得成就：连胜达人
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="action-group">
+                            <div class="action-btn liked">
+                                <i class="fas fa-heart"></i>
+                                <span>128</span>
+                            </div>
+                            <div class="action-btn">
+                                <i class="fas fa-comment"></i>
+                                <span>23</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-share-alt share-btn"></i>
+                    </div>
+                </div>
+                
+                <!-- 战队动态 -->
+                <div class="post-card team-post">
+                    <div class="post-header">
+                        <div class="user-avatar">雷</div>
+                        <div class="user-info">
+                            <div class="user-name">雷霆队长</div>
+                            <div class="post-time">4小时前</div>
+                        </div>
+                        <i class="fas fa-ellipsis-h post-menu"></i>
+                    </div>
+                    
+                    <div class="team-info">
+                        <div class="team-logo">雷</div>
+                        <span class="team-name">雷霆战队</span>
+                        <span class="rank-badge">钻石段位</span>
+                    </div>
+                    
+                    <div class="post-content">
+                        <div class="post-text">恭喜我们战队在今天的团队赛中取得冠军！团队配合越来越默契了 💪</div>
+                        
+                        <div class="post-images">
+                            <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=150&h=150&fit=crop');"></div>
+                            <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=150&h=150&fit=crop');"></div>
+                        </div>
+                        
+                        <div class="post-tags">
+                            <span class="post-tag">#团队赛</span>
+                            <span class="post-tag">#冠军</span>
+                            <span class="post-tag">#雷霆战队</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="action-group">
+                            <div class="action-btn">
+                                <i class="fas fa-heart"></i>
+                                <span>256</span>
+                            </div>
+                            <div class="action-btn">
+                                <i class="fas fa-comment"></i>
+                                <span>45</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-share-alt share-btn"></i>
+                    </div>
+                </div>
+                
+                <!-- 装备展示 -->
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="user-avatar">影</div>
+                        <div class="user-info">
+                            <div class="user-name">影子刺客</div>
+                            <div class="post-time">6小时前</div>
+                        </div>
+                        <i class="fas fa-ellipsis-h post-menu"></i>
+                    </div>
+                    
+                    <div class="post-content">
+                        <div class="post-text">新装备到手！这把激光枪的手感真的太棒了，精准度大幅提升 ⚡</div>
+                        
+                        <div class="post-images">
+                            <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1556438064-2d7646166914?w=300&h=150&fit=crop'); grid-column: 1 / -1; aspect-ratio: 2;"></div>
+                        </div>
+                        
+                        <div class="post-tags">
+                            <span class="post-tag">#新装备</span>
+                            <span class="post-tag">#激光枪</span>
+                            <span class="post-tag">#装备测评</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="action-group">
+                            <div class="action-btn">
+                                <i class="fas fa-heart"></i>
+                                <span>89</span>
+                            </div>
+                            <div class="action-btn">
+                                <i class="fas fa-comment"></i>
+                                <span>12</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-share-alt share-btn"></i>
+                    </div>
+                </div>
+                
+                <!-- 训练心得 -->
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="user-avatar">神</div>
+                        <div class="user-info">
+                            <div class="user-name">神枪手小李</div>
+                            <div class="post-time">8小时前</div>
+                        </div>
+                        <i class="fas fa-ellipsis-h post-menu"></i>
+                    </div>
+                    
+                    <div class="post-content">
+                        <div class="post-text">分享一个瞄准技巧：保持呼吸节奏，在呼气末端开火，命中率会大大提升！</div>
+                        
+                        <div class="post-tags">
+                            <span class="post-tag">#训练技巧</span>
+                            <span class="post-tag">#瞄准</span>
+                            <span class="post-tag">#经验分享</span>
+                        </div>
+                        
+                        <div class="battle-stats">
+                            <div class="stats-header">
+                                <i class="fas fa-bullseye stats-icon"></i>
+                                <span class="stats-title">精准度提升</span>
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-value">92%</div>
+                                    <div class="stat-label">命中率</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">+15%</div>
+                                    <div class="stat-label">本周提升</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">156</div>
+                                    <div class="stat-label">爆头数</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="action-group">
+                            <div class="action-btn">
+                                <i class="fas fa-heart"></i>
+                                <span>203</span>
+                            </div>
+                            <div class="action-btn">
+                                <i class="fas fa-comment"></i>
+                                <span>67</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-share-alt share-btn"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+
+        // 发布动态按钮
+        document.querySelector('.post-btn').addEventListener('click', function() {
+            alert('发布动态功能待开发');
+        });
+
+        // 筛选标签
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活跃状态
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                // 添加当前活跃状态
+                this.classList.add('active');
+                
+                const filterType = this.textContent;
+                alert(`筛选${filterType}动态功能待开发`);
+            });
+        });
+
+        // 动态卡片点击
+        document.querySelectorAll('.post-card').forEach(card => {
+            // 用户头像和名称点击
+            const userInfo = card.querySelector('.user-info');
+            const userAvatar = card.querySelector('.user-avatar');
+            
+            [userInfo, userAvatar].forEach(element => {
+                element.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const userName = card.querySelector('.user-name').textContent;
+                    alert(`查看${userName}的个人主页`);
+                });
+            });
+
+            // 菜单按钮点击
+            card.querySelector('.post-menu').addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (confirm('动态操作：\n1. 举报\n2. 屏蔽\n\n是否继续？')) {
+                    alert('动态操作功能待开发');
+                }
+            });
+
+            // 点赞按钮
+            card.querySelector('.action-btn:first-child').addEventListener('click', function(e) {
+                e.stopPropagation();
+                const likeCount = this.querySelector('span');
+                const currentLikes = parseInt(likeCount.textContent);
+                const icon = this.querySelector('i');
+                
+                if (!this.classList.contains('active')) {
+                    likeCount.textContent = currentLikes + 1;
+                    this.classList.add('active');
+                    icon.style.color = '#ff4757';
+                } else {
+                    likeCount.textContent = currentLikes - 1;
+                    this.classList.remove('active');
+                    icon.style.color = '';
+                }
+            });
+
+            // 评论按钮
+            card.querySelector('.action-btn:nth-child(2)').addEventListener('click', function(e) {
+                e.stopPropagation();
+                alert('评论功能待开发');
+            });
+
+            // 分享按钮
+            card.querySelector('.share-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                window.location.href = '分享页.html';
+            });
+
+            // 标签点击
+            card.querySelectorAll('.post-tag').forEach(tag => {
+                tag.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const tagText = this.textContent;
+                    alert(`查看${tagText}相关动态`);
+                });
+            });
+
+            // 战绩卡片点击
+            const battleStats = card.querySelector('.battle-stats');
+            if (battleStats) {
+                battleStats.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    window.location.href = '战绩详情页.html';
+                });
+            }
+        });
+
+        // 底部导航
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const navText = this.querySelector('.nav-text').textContent;
+                
+                switch(navText) {
+                    case '首页':
+                        window.location.href = '首页.html';
+                        break;
+                    case '战绩':
+                        window.location.href = '战绩详情页.html';
+                        break;
+                    case '战队':
+                        window.location.href = '战队页.html';
+                        break;
+                    case '商城':
+                        window.location.href = '商城页.html';
+                        break;
+                    case '我的':
+                        window.location.href = '个人中心页.html';
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

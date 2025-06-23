@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 好友</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .add-friend-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .search-bar {
+            margin: 0 20px 20px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 12px 20px 12px 45px;
+            color: white;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .filter-tabs {
+            margin: 0 20px 20px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            padding: 5px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        .filter-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .filter-tab.active {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+        }
+        
+        .friends-container {
+            margin: 0 20px 100px;
+        }
+        
+        .friend-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            position: relative;
+        }
+        
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #00ff00;
+            border: 2px solid #000;
+            border-radius: 50%;
+        }
+        
+        .offline-indicator {
+            background: #666;
+        }
+        
+        .friend-info {
+            flex: 1;
+        }
+        
+        .friend-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .friend-status {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .friend-stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stat-icon {
+            color: #00ffff;
+            font-size: 12px;
+        }
+        
+        .stat-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+        
+        .friend-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .btn-message {
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .btn-invite {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+        
+        .btn-more {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .team-badge {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        
+        .rank-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        
+        .friend-request {
+            border-left: 4px solid #ffa500;
+        }
+        
+        .request-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-accept {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .btn-decline {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            color: #00ffff;
+        }
+        
+        .quick-actions {
+            margin: 0 20px 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .quick-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .quick-icon {
+            color: #00ffff;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .quick-text {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <div style="width: 40px;"></div>
+                <h1 class="header-title">好友</h1>
+                <button class="add-friend-btn">
+                    <i class="fas fa-user-plus"></i>
+                </button>
+            </div>
+            
+            <!-- 搜索栏 -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="搜索好友...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <div class="quick-action">
+                    <div class="quick-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div class="quick-text">扫码加友</div>
+                </div>
+                <div class="quick-action">
+                    <div class="quick-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="quick-text">附近的人</div>
+                </div>
+                <div class="quick-action">
+                    <div class="quick-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="quick-text">游戏好友</div>
+                </div>
+                <div class="quick-action">
+                    <div class="quick-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="quick-text">排行榜</div>
+                </div>
+            </div>
+            
+            <!-- 筛选标签 -->
+            <div class="filter-tabs">
+                <div class="filter-tab active">全部</div>
+                <div class="filter-tab">在线</div>
+                <div class="filter-tab">战队</div>
+                <div class="filter-tab">请求</div>
+            </div>
+            
+            <!-- 好友列表 -->
+            <div class="friends-container">
+                <!-- 好友请求 -->
+                <h3 class="section-title">
+                    <i class="fas fa-user-clock section-icon"></i>
+                    好友请求 (2)
+                </h3>
+                
+                <div class="friend-card friend-request">
+                    <div class="friend-avatar">新</div>
+                    <div class="friend-info">
+                        <div class="friend-name">新手小白</div>
+                        <div class="friend-status">想要添加您为好友</div>
+                        <div class="friend-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-star stat-icon"></i>
+                                <span class="stat-text">青铜段位</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="request-actions">
+                        <button class="btn-accept">接受</button>
+                        <button class="btn-decline">拒绝</button>
+                    </div>
+                </div>
+                
+                <div class="friend-card friend-request">
+                    <div class="friend-avatar">战</div>
+                    <div class="friend-info">
+                        <div class="friend-name">战神归来</div>
+                        <div class="friend-status">想要添加您为好友</div>
+                        <div class="friend-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-crown stat-icon"></i>
+                                <span class="stat-text">王者段位</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="request-actions">
+                        <button class="btn-accept">接受</button>
+                        <button class="btn-decline">拒绝</button>
+                    </div>
+                </div>
+                
+                <!-- 在线好友 -->
+                <h3 class="section-title">
+                    <i class="fas fa-circle section-icon" style="color: #00ff00;"></i>
+                    在线好友 (8)
+                </h3>
+                
+                <div class="friend-card">
+                    <div class="friend-avatar">
+                        星
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">
+                            星际战士
+                            <span class="team-badge">队友</span>
+                        </div>
+                        <div class="friend-status">正在游戏中 - 团队竞技</div>
+                        <div class="friend-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-trophy stat-icon"></i>
+                                <span class="stat-text">钻石III</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-fire stat-icon"></i>
+                                <span class="stat-text">连胜5</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="action-btn btn-message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn btn-invite">
+                            <i class="fas fa-gamepad"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="friend-card">
+                    <div class="friend-avatar">
+                        雷
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">
+                            雷霆队长
+                            <span class="rank-badge">MVP</span>
+                        </div>
+                        <div class="friend-status">在线 - 大厅等待</div>
+                        <div class="friend-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-crown stat-icon"></i>
+                                <span class="stat-text">王者I</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-bullseye stat-icon"></i>
+                                <span class="stat-text">95%命中</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="action-btn btn-message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn btn-invite">
+                            <i class="fas fa-gamepad"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="friend-card">
+                    <div class="friend-avatar">
+                        影
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">影子刺客</div>
+                        <div class="friend-status">正在训练 - 射击场</div>
+                        <div class="friend-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-gem stat-icon"></i>
+                                <span class="stat-text">钻石I</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-crosshairs stat-icon"></i>
+                                <span class="stat-text">狙击手</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="action-btn btn-message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn btn-invite">
+                            <i class="fas fa-gamepad"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 离线好友 -->
+                <h3 class="section-title">
+                    <i class="fas fa-circle section-icon" style="color: #666;"></i>
+                    离线好友 (15)
+                </h3>
+                
+                <div class="friend-card">
+                    <div class="friend-avatar">
+                        神
+                        <div class="online-indicator offline-indicator"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">神枪手小李</div>
+                        <div class="friend-status">2小时前在线</div>
+                        <div class="friend-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-star stat-icon"></i>
+                                <span class="stat-text">白金II</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-medal stat-icon"></i>
+                                <span class="stat-text">精英</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="action-btn btn-message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn btn-more">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="friend-card">
+                    <div class="friend-avatar">
+                        风
+                        <div class="online-indicator offline-indicator"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">疾风少年</div>
+                        <div class="friend-status">昨天在线</div>
+                        <div class="friend-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-shield-alt stat-icon"></i>
+                                <span class="stat-text">白金III</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-running stat-icon"></i>
+                                <span class="stat-text">速度型</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="action-btn btn-message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn btn-more">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="friend-card">
+                    <div class="friend-avatar">
+                        龙
+                        <div class="online-indicator offline-indicator"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">龙战士</div>
+                        <div class="friend-status">3天前在线</div>
+                        <div class="friend-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-coins stat-icon"></i>
+                                <span class="stat-text">黄金I</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-fist-raised stat-icon"></i>
+                                <span class="stat-text">近战</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="action-btn btn-message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn btn-more">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+
+        // 添加好友按钮
+        document.querySelector('.add-friend-btn').addEventListener('click', function() {
+            alert('添加好友功能待开发');
+        });
+
+        // 搜索功能
+        document.querySelector('.search-input').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            if (searchTerm) {
+                alert(`搜索好友：${searchTerm}`);
+            }
+        });
+
+        // 快捷操作
+        document.querySelectorAll('.quick-action').forEach(action => {
+            action.addEventListener('click', function() {
+                const actionText = this.querySelector('.quick-text').textContent;
+                alert(`${actionText}功能待开发`);
+            });
+        });
+
+        // 筛选标签
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活跃状态
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                // 添加当前活跃状态
+                this.classList.add('active');
+                
+                const filterType = this.textContent;
+                alert(`筛选${filterType}好友功能待开发`);
+            });
+        });
+
+        // 好友卡片点击
+        document.querySelectorAll('.friend-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // 如果点击的是操作按钮，不触发卡片点击
+                if (e.target.closest('.friend-actions')) return;
+                
+                const friendName = this.querySelector('.friend-name').textContent.trim();
+                alert(`查看${friendName}的个人资料`);
+            });
+        });
+
+        // 消息按钮
+        document.querySelectorAll('.btn-message').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const friendName = this.closest('.friend-card').querySelector('.friend-name').textContent.trim();
+                alert(`向${friendName}发送消息功能待开发`);
+            });
+        });
+
+        // 邀请游戏按钮
+        document.querySelectorAll('.btn-invite').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const friendName = this.closest('.friend-card').querySelector('.friend-name').textContent.trim();
+                alert(`邀请${friendName}游戏功能待开发`);
+            });
+        });
+
+        // 底部导航
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const navText = this.querySelector('.nav-text').textContent;
+                
+                switch(navText) {
+                    case '首页':
+                        window.location.href = '首页.html';
+                        break;
+                    case '战绩':
+                        window.location.href = '战绩详情页.html';
+                        break;
+                    case '战队':
+                        window.location.href = '战队页.html';
+                        break;
+                    case '商城':
+                        window.location.href = '商城页.html';
+                        break;
+                    case '我的':
+                        window.location.href = '个人中心页.html';
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

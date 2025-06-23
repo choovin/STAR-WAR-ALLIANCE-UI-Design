@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 预约游戏</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .store-selector {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            color: #00ffff;
+        }
+        
+        .store-item {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .store-item.selected {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .store-image {
+            width: 50px;
+            height: 50px;
+            background: url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=50&h=50&fit=crop') center/cover;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        .store-info {
+            flex: 1;
+        }
+        
+        .store-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .store-address {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .store-distance {
+            color: #00ffff;
+            font-size: 12px;
+        }
+        
+        .store-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .store-radio.selected {
+            border-color: #00ffff;
+        }
+        
+        .store-radio.selected::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #00ffff;
+            border-radius: 50%;
+        }
+        
+        .date-selector {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .date-item {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .date-item.selected {
+            background: linear-gradient(135deg, #00ffff, #0080ff);
+            border-color: transparent;
+        }
+        
+        .date-item.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .date-day {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 10px;
+            margin-bottom: 2px;
+        }
+        
+        .date-number {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .time-selector {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .time-periods {
+            margin-top: 15px;
+        }
+        
+        .period-title {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .period-icon {
+            font-size: 12px;
+        }
+        
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .time-slot {
+            padding: 12px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .time-slot.selected {
+            background: linear-gradient(135deg, #00ffff, #0080ff);
+            border-color: transparent;
+        }
+        
+        .time-slot.unavailable {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .time-text {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .time-status {
+            font-size: 10px;
+        }
+        
+        .status-available {
+            color: #00ff00;
+        }
+        
+        .status-busy {
+            color: #ffa500;
+        }
+        
+        .status-full {
+            color: #ff4444;
+        }
+        
+        .package-selector {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .package-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .package-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .package-item.selected {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .package-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .package-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .package-price {
+            color: #00ffff;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .booking-summary {
+            margin: 0 20px 100px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+            margin-top: 10px;
+            padding-top: 15px;
+        }
+        
+        .summary-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        
+        .summary-value {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .total-price {
+            color: #00ffff;
+            font-size: 20px;
+            font-weight: 900;
+        }
+        
+        .confirm-button {
+            position: fixed;
+            bottom: 20px;
+            left: 28px;
+            right: 28px;
+            height: 50px;
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .confirm-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 255, 255, 0.4);
+        }
+        
+        .confirm-button:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">预约游戏</h1>
+                <div style="width: 40px;"></div>
+            </div>
+            
+            <!-- 门店选择 -->
+            <div class="store-selector">
+                <h3 class="section-title">
+                    <i class="fas fa-map-marker-alt section-icon"></i>
+                    选择门店
+                </h3>
+                
+                <div class="store-item selected">
+                    <div class="store-image"></div>
+                    <div class="store-info">
+                        <div class="store-name">星战大联盟旗舰店</div>
+                        <div class="store-address">朝阳区三里屯太古里南区</div>
+                        <div class="store-distance">距离您 1.2km</div>
+                    </div>
+                    <div class="store-radio selected"></div>
+                </div>
+            </div>
+            
+            <!-- 日期选择 -->
+            <div class="date-selector">
+                <h3 class="section-title">
+                    <i class="fas fa-calendar-alt section-icon"></i>
+                    选择日期
+                </h3>
+                
+                <div class="date-grid">
+                    <div class="date-item disabled">
+                        <div class="date-day">周一</div>
+                        <div class="date-number">11</div>
+                    </div>
+                    <div class="date-item disabled">
+                        <div class="date-day">周二</div>
+                        <div class="date-number">12</div>
+                    </div>
+                    <div class="date-item disabled">
+                        <div class="date-day">周三</div>
+                        <div class="date-number">13</div>
+                    </div>
+                    <div class="date-item disabled">
+                        <div class="date-day">周四</div>
+                        <div class="date-number">14</div>
+                    </div>
+                    <div class="date-item selected">
+                        <div class="date-day">今天</div>
+                        <div class="date-number">15</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周六</div>
+                        <div class="date-number">16</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周日</div>
+                        <div class="date-number">17</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周一</div>
+                        <div class="date-number">18</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周二</div>
+                        <div class="date-number">19</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周三</div>
+                        <div class="date-number">20</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周四</div>
+                        <div class="date-number">21</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周五</div>
+                        <div class="date-number">22</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周六</div>
+                        <div class="date-number">23</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-day">周日</div>
+                        <div class="date-number">24</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 时间选择 -->
+            <div class="time-selector">
+                <h3 class="section-title">
+                    <i class="fas fa-clock section-icon"></i>
+                    选择时间
+                </h3>
+                
+                <div class="time-periods">
+                    <div class="period-title">
+                        <i class="fas fa-sun period-icon" style="color: #ffa500;"></i>
+                        上午时段
+                    </div>
+                    <div class="time-grid">
+                        <div class="time-slot">
+                            <div class="time-text">09:00</div>
+                            <div class="time-status status-available">可预约</div>
+                        </div>
+                        <div class="time-slot">
+                            <div class="time-text">10:00</div>
+                            <div class="time-status status-busy">较忙</div>
+                        </div>
+                        <div class="time-slot selected">
+                            <div class="time-text">11:00</div>
+                            <div class="time-status status-available">可预约</div>
+                        </div>
+                    </div>
+                    
+                    <div class="period-title">
+                        <i class="fas fa-sun period-icon" style="color: #ff6b6b;"></i>
+                        下午时段
+                    </div>
+                    <div class="time-grid">
+                        <div class="time-slot">
+                            <div class="time-text">14:00</div>
+                            <div class="time-status status-available">可预约</div>
+                        </div>
+                        <div class="time-slot unavailable">
+                            <div class="time-text">15:00</div>
+                            <div class="time-status status-full">已满</div>
+                        </div>
+                        <div class="time-slot">
+                            <div class="time-text">16:00</div>
+                            <div class="time-status status-busy">较忙</div>
+                        </div>
+                        <div class="time-slot">
+                            <div class="time-text">17:00</div>
+                            <div class="time-status status-available">可预约</div>
+                        </div>
+                        <div class="time-slot unavailable">
+                            <div class="time-text">18:00</div>
+                            <div class="time-status status-full">已满</div>
+                        </div>
+                        <div class="time-slot">
+                            <div class="time-text">19:00</div>
+                            <div class="time-status status-available">可预约</div>
+                        </div>
+                    </div>
+                    
+                    <div class="period-title">
+                        <i class="fas fa-moon period-icon" style="color: #4169e1;"></i>
+                        晚上时段
+                    </div>
+                    <div class="time-grid">
+                        <div class="time-slot">
+                            <div class="time-text">20:00</div>
+                            <div class="time-status status-available">可预约</div>
+                        </div>
+                        <div class="time-slot">
+                            <div class="time-text">21:00</div>
+                            <div class="time-status status-busy">较忙</div>
+                        </div>
+                        <div class="time-slot">
+                            <div class="time-text">22:00</div>
+                            <div class="time-status status-available">可预约</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 套餐选择 -->
+            <div class="package-selector">
+                <h3 class="section-title">
+                    <i class="fas fa-box section-icon"></i>
+                    选择套餐
+                </h3>
+                
+                <div class="package-grid">
+                    <div class="package-item">
+                        <div class="package-name">单人体验</div>
+                        <div class="package-desc">60分钟游戏时长，适合新手体验</div>
+                        <div class="package-price">¥68</div>
+                    </div>
+                    
+                    <div class="package-item selected">
+                        <div class="package-name">双人对战</div>
+                        <div class="package-desc">90分钟双人游戏，含装备租赁</div>
+                        <div class="package-price">¥128</div>
+                    </div>
+                    
+                    <div class="package-item">
+                        <div class="package-name">团队竞技</div>
+                        <div class="package-desc">120分钟5v5团队对战</div>
+                        <div class="package-price">¥298</div>
+                    </div>
+                    
+                    <div class="package-item">
+                        <div class="package-name">VIP专场</div>
+                        <div class="package-desc">180分钟私人专场，专属服务</div>
+                        <div class="package-price">¥588</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 预约汇总 -->
+            <div class="booking-summary">
+                <h3 class="section-title">
+                    <i class="fas fa-list-check section-icon"></i>
+                    预约信息
+                </h3>
+                
+                <div class="summary-row">
+                    <span class="summary-label">门店</span>
+                    <span class="summary-value">星战大联盟旗舰店</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">日期</span>
+                    <span class="summary-value">12月15日 (今天)</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">时间</span>
+                    <span class="summary-value">11:00 - 12:30</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">套餐</span>
+                    <span class="summary-value">双人对战套餐</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">总价</span>
+                    <span class="total-price">¥128</span>
+                </div>
+            </div>
+            
+            <!-- 确认按钮 -->
+            <button class="confirm-button">
+                <i class="fas fa-calendar-check"></i>
+                确认预约
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let selectedStore = null;
+        let selectedDate = null;
+        let selectedTime = null;
+
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+
+        // 门店选择
+        document.querySelectorAll('.store-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 移除所有选中状态
+                document.querySelectorAll('.store-card').forEach(c => c.classList.remove('selected'));
+                // 添加当前选中状态
+                this.classList.add('selected');
+                
+                selectedStore = this.querySelector('.store-name').textContent;
+                updateConfirmButton();
+            });
+        });
+
+        // 日期选择
+        document.querySelectorAll('.date-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有选中状态
+                document.querySelectorAll('.date-item').forEach(i => i.classList.remove('selected'));
+                // 添加当前选中状态
+                this.classList.add('selected');
+                
+                const day = this.querySelector('.date-day').textContent;
+                const number = this.querySelector('.date-number').textContent;
+                selectedDate = `${day} ${number}日`;
+                updateConfirmButton();
+            });
+        });
+
+        // 时间选择
+        document.querySelectorAll('.time-slot').forEach(slot => {
+            slot.addEventListener('click', function() {
+                const status = this.querySelector('.time-status');
+                
+                // 检查是否为已满状态
+                if (status.classList.contains('status-full')) {
+                    alert('该时段已满，请选择其他时间');
+                    return;
+                }
+                
+                // 移除所有选中状态
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                // 添加当前选中状态
+                this.classList.add('selected');
+                
+                selectedTime = this.querySelector('.time-text').textContent;
+                updateConfirmButton();
+            });
+        });
+
+        // 更新确认按钮状态
+        function updateConfirmButton() {
+            const confirmBtn = document.querySelector('.confirm-button');
+            
+            if (selectedStore && selectedDate && selectedTime) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = `
+                    <i class="fas fa-check"></i>
+                    确认预约
+                `;
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = `
+                    <i class="fas fa-calendar-plus"></i>
+                    请完成选择
+                `;
+            }
+        }
+
+        // 确认预约按钮
+        document.querySelector('.confirm-button').addEventListener('click', function() {
+            if (this.disabled) return;
+            
+            const confirmMessage = `确认预约信息：\n\n门店：${selectedStore}\n日期：${selectedDate}\n时间：${selectedTime}\n\n是否确认预约？`;
+            
+            if (confirm(confirmMessage)) {
+                alert('预约成功！\n\n预约详情已发送到您的消息中心，请按时到店体验。');
+                // 可以在这里跳转到订单页面
+                // window.location.href = '订单页.html';
+            }
+        });
+
+        // 门店详情按钮
+        document.querySelectorAll('.store-card').forEach(card => {
+            const detailBtn = card.querySelector('.store-distance');
+            if (detailBtn) {
+                detailBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const storeName = card.querySelector('.store-name').textContent;
+                    alert(`查看${storeName}详细信息功能待开发`);
+                });
+            }
+        });
+
+        // 底部导航
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const navText = this.querySelector('.nav-text').textContent;
+                
+                switch(navText) {
+                    case '首页':
+                        window.location.href = '首页.html';
+                        break;
+                    case '战绩':
+                        window.location.href = '战绩详情页.html';
+                        break;
+                    case '战队':
+                        window.location.href = '战队页.html';
+                        break;
+                    case '商城':
+                        window.location.href = '商城页.html';
+                        break;
+                    case '我的':
+                        window.location.href = '个人中心页.html';
+                        break;
+                }
+            });
+        });
+
+        // 初始化确认按钮状态
+        updateConfirmButton();
+    </script>
+</body>
+</html>

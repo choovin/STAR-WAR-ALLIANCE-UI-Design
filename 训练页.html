@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 训练</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .training-stats {
+            margin: 0 20px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 128, 255, 0.1));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stats-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .stats-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stats-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+        }
+        
+        .stat-number {
+            color: #00ffff;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+        
+        .training-modes {
+            margin: 0 20px 20px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            color: #00ffff;
+        }
+        
+        .mode-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .mode-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .mode-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .mode-info {
+            flex: 1;
+        }
+        
+        .mode-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .mode-desc {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .mode-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .mode-difficulty {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .difficulty-star {
+            color: #ffd700;
+            font-size: 12px;
+        }
+        
+        .difficulty-star.empty {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .mode-duration {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .mode-progress {
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .mode-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 10px;
+            color: #00ffff;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .mode-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .badge-new {
+            background: linear-gradient(45deg, #e74c3c, #ec7063);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .badge-recommended {
+            background: linear-gradient(45deg, #f39c12, #f7dc6f);
+            color: white;
+        }
+        
+        .badge-locked {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .mode-card.locked {
+            opacity: 0.6;
+        }
+        
+        .mode-card.locked .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+        
+        .skill-analysis {
+            margin: 0 20px 20px;
+        }
+        
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .skill-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .skill-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            margin: 0 auto 10px;
+        }
+        
+        .skill-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .skill-level {
+            color: #00ffff;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .skill-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .skill-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            border-radius: 2px;
+        }
+        
+        .daily-challenges {
+            margin: 0 20px 100px;
+        }
+        
+        .challenge-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .challenge-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ffa500, #ffb347);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .challenge-info {
+            flex: 1;
+        }
+        
+        .challenge-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .challenge-desc {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .challenge-reward {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #ffa500;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .challenge-progress {
+            text-align: right;
+        }
+        
+        .challenge-status {
+            color: #00ffff;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .challenge-percentage {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">训练中心</h1>
+                <div style="width: 40px;"></div>
+            </div>
+            
+            <!-- 训练统计 -->
+            <div class="training-stats">
+                <div class="stats-header">
+                    <div class="stats-title">本周训练统计</div>
+                    <div class="stats-subtitle">持续提升，成为更强的战士</div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">训练场次</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">3.5h</div>
+                        <div class="stat-label">训练时长</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">85%</div>
+                        <div class="stat-label">平均命中率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">+15%</div>
+                        <div class="stat-label">技能提升</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 训练模式 -->
+            <div class="training-modes">
+                <h3 class="section-title">
+                    <i class="fas fa-target section-icon"></i>
+                    训练模式
+                </h3>
+                
+                <div class="mode-card">
+                    <div class="mode-badge badge-recommended">推荐</div>
+                    <div class="mode-header">
+                        <div class="mode-icon">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div class="mode-info">
+                            <div class="mode-name">精准射击</div>
+                            <div class="mode-desc">提升瞄准精度和反应速度</div>
+                        </div>
+                    </div>
+                    <div class="mode-meta">
+                        <div class="mode-difficulty">
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star empty"></i>
+                            <i class="fas fa-star difficulty-star empty"></i>
+                        </div>
+                        <div class="mode-duration">15-30分钟</div>
+                    </div>
+                    <div class="mode-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>掌握度: 75%</span>
+                            <span>等级 3/5</span>
+                        </div>
+                    </div>
+                    <div class="mode-actions">
+                        <div class="action-btn">查看记录</div>
+                        <div class="action-btn primary">开始训练</div>
+                    </div>
+                </div>
+                
+                <div class="mode-card">
+                    <div class="mode-badge badge-new">NEW</div>
+                    <div class="mode-header">
+                        <div class="mode-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="mode-info">
+                            <div class="mode-name">移动射击</div>
+                            <div class="mode-desc">在移动中保持射击精度</div>
+                        </div>
+                    </div>
+                    <div class="mode-meta">
+                        <div class="mode-difficulty">
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star empty"></i>
+                        </div>
+                        <div class="mode-duration">20-40分钟</div>
+                    </div>
+                    <div class="mode-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%;"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>掌握度: 45%</span>
+                            <span>等级 2/5</span>
+                        </div>
+                    </div>
+                    <div class="mode-actions">
+                        <div class="action-btn">查看记录</div>
+                        <div class="action-btn primary">开始训练</div>
+                    </div>
+                </div>
+                
+                <div class="mode-card">
+                    <div class="mode-header">
+                        <div class="mode-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="mode-info">
+                            <div class="mode-name">团队配合</div>
+                            <div class="mode-desc">与AI队友练习团队战术</div>
+                        </div>
+                    </div>
+                    <div class="mode-meta">
+                        <div class="mode-difficulty">
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                        </div>
+                        <div class="mode-duration">30-60分钟</div>
+                    </div>
+                    <div class="mode-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%;"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>掌握度: 60%</span>
+                            <span>等级 3/5</span>
+                        </div>
+                    </div>
+                    <div class="mode-actions">
+                        <div class="action-btn">查看记录</div>
+                        <div class="action-btn primary">开始训练</div>
+                    </div>
+                </div>
+                
+                <div class="mode-card locked">
+                    <div class="mode-badge badge-locked">锁定</div>
+                    <div class="mode-header">
+                        <div class="mode-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="mode-info">
+                            <div class="mode-name">王者挑战</div>
+                            <div class="mode-desc">达到钻石段位后解锁</div>
+                        </div>
+                    </div>
+                    <div class="mode-meta">
+                        <div class="mode-difficulty">
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                            <i class="fas fa-star difficulty-star"></i>
+                        </div>
+                        <div class="mode-duration">45-90分钟</div>
+                    </div>
+                    <div class="mode-actions">
+                        <div class="action-btn">需要解锁</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 技能分析 -->
+            <div class="skill-analysis">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line section-icon"></i>
+                    技能分析
+                </h3>
+                
+                <div class="skill-grid">
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div class="skill-name">瞄准</div>
+                        <div class="skill-level">专家级</div>
+                        <div class="skill-progress">
+                            <div class="skill-progress-fill" style="width: 85%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="skill-name">反应</div>
+                        <div class="skill-level">高级</div>
+                        <div class="skill-progress">
+                            <div class="skill-progress-fill" style="width: 72%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="skill-name">移动</div>
+                        <div class="skill-level">中级</div>
+                        <div class="skill-progress">
+                            <div class="skill-progress-fill" style="width: 58%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-card">
+                        <div class="skill-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="skill-name">团队</div>
+                        <div class="skill-level">高级</div>
+                        <div class="skill-progress">
+                            <div class="skill-progress-fill" style="width: 78%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 每日挑战 -->
+            <div class="daily-challenges">
+                <h3 class="section-title">
+                    <i class="fas fa-calendar-day section-icon"></i>
+                    每日挑战
+                </h3>
+                
+                <div class="challenge-card">
+                    <div class="challenge-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="challenge-info">
+                        <div class="challenge-name">百发百中</div>
+                        <div class="challenge-desc">在精准射击模式中达成100%命中率</div>
+                        <div class="challenge-reward">
+                            <i class="fas fa-coins"></i>
+                            <span>奖励: 200积分</span>
+                        </div>
+                    </div>
+                    <div class="challenge-progress">
+                        <div class="challenge-status">进行中</div>
+                        <div class="challenge-percentage">85/100</div>
+                    </div>
+                </div>
+                
+                <div class="challenge-card">
+                    <div class="challenge-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="challenge-info">
+                        <div class="challenge-name">速度之王</div>
+                        <div class="challenge-desc">在5分钟内完成移动射击训练</div>
+                        <div class="challenge-reward">
+                            <i class="fas fa-trophy"></i>
+                            <span>奖励: 速度徽章</span>
+                        </div>
+                    </div>
+                    <div class="challenge-progress">
+                        <div class="challenge-status">未开始</div>
+                        <div class="challenge-percentage">0/1</div>
+                    </div>
+                </div>
+                
+                <div class="challenge-card">
+                    <div class="challenge-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="challenge-info">
+                        <div class="challenge-name">连击大师</div>
+                        <div class="challenge-desc">在任意模式中达成50连击</div>
+                        <div class="challenge-reward">
+                            <i class="fas fa-star"></i>
+                            <span>奖励: 连击称号</span>
+                        </div>
+                    </div>
+                    <div class="challenge-progress">
+                        <div class="challenge-status">进行中</div>
+                        <div class="challenge-percentage">32/50</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 页面跳转函数
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        // 添加点击事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮
+            document.querySelector('.back-btn').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 训练模式卡片点击
+            document.querySelectorAll('.mode-card').forEach(function(card, index) {
+                card.addEventListener('click', function() {
+                    const modeName = this.querySelector('.mode-title').textContent;
+                    if (this.classList.contains('locked')) {
+                        alert('该训练模式尚未解锁，请提升等级后再试');
+                    } else {
+                        alert('开始' + modeName + '训练模式');
+                        // 这里可以跳转到具体的训练游戏页面
+                        // navigateTo('训练游戏页.html?mode=' + index);
+                    }
+                });
+            });
+            
+            // 技能分析项点击
+            document.querySelectorAll('.skill-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    const skillName = this.querySelector('.skill-name').textContent;
+                    alert('查看' + skillName + '详细分析功能待开发');
+                });
+            });
+            
+            // 每日挑战项点击
+            document.querySelectorAll('.challenge-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    const challengeName = this.querySelector('.challenge-name').textContent;
+                    const status = this.querySelector('.challenge-status').textContent;
+                    
+                    if (status === '已完成') {
+                        alert('今日挑战已完成，明天再来吧！');
+                    } else {
+                        alert('开始挑战：' + challengeName);
+                        // 这里可以跳转到具体的挑战页面
+                        // navigateTo('挑战页.html?challenge=' + challengeName);
+                    }
+                });
+            });
+            
+            // 底部导航
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('首页.html');
+            });
+            navItems[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战绩详情页.html');
+            });
+            navItems[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战队页.html');
+            });
+            navItems[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('商城页.html');
+            });
+            navItems[4].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('个人中心页.html');
+            });
+        });
+    </script>
+</body>
+</html>

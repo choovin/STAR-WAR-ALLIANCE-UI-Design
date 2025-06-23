@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 首页</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: url('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=50&h=50&fit=crop') center/cover;
+            border: 2px solid #00ffff;
+        }
+        
+        .user-details h3 {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .user-level {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .notification-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .stats-card {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .stats-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .view-detail {
+            color: #00ffff;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00ffff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .quick-actions {
+            margin: 0 20px 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .action-icon {
+            font-size: 24px;
+            color: #00ffff;
+            margin-bottom: 8px;
+        }
+        
+        .action-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .recent-matches {
+            margin: 0 20px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .match-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .match-info {
+            flex: 1;
+        }
+        
+        .match-result {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .match-result.win {
+            color: #00ff88;
+        }
+        
+        .match-result.lose {
+            color: #ff4444;
+        }
+        
+        .match-details {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .match-score {
+            text-align: right;
+        }
+        
+        .score {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00ffff;
+        }
+        
+        .kda {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <div class="user-info">
+                    <div class="avatar"></div>
+                    <div class="user-details">
+                        <h3>星际战士</h3>
+                        <div class="user-level">LV.15</div>
+                    </div>
+                </div>
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
+            
+            <!-- 战绩卡片 -->
+            <div class="stats-card">
+                <div class="stats-header">
+                    <h2 class="stats-title">本周战绩</h2>
+                    <a href="#" class="view-detail">查看详情 ></a>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">28</div>
+                        <div class="stat-label">总场次</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">75%</div>
+                        <div class="stat-label">胜率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2.8</div>
+                        <div class="stat-label">K/D比</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">总击杀</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <a href="#" class="action-btn">
+                    <div class="action-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="action-text">购买套餐</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="action-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="action-text">预约游戏</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="action-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="action-text">我的战队</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="action-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="action-text">排行榜</div>
+                </a>
+            </div>
+            
+            <!-- 最近战斗 -->
+            <div class="recent-matches">
+                <h3 class="section-title">最近战斗</h3>
+                
+                <div class="match-item">
+                    <div class="match-info">
+                        <div class="match-result win">胜利</div>
+                        <div class="match-details">团队竞技 • 2分钟前</div>
+                    </div>
+                    <div class="match-score">
+                        <div class="score">2850</div>
+                        <div class="kda">15/3/8</div>
+                    </div>
+                </div>
+                
+                <div class="match-item">
+                    <div class="match-info">
+                        <div class="match-result win">胜利</div>
+                        <div class="match-details">占点模式 • 1小时前</div>
+                    </div>
+                    <div class="match-score">
+                        <div class="score">3120</div>
+                        <div class="kda">18/2/12</div>
+                    </div>
+                </div>
+                
+                <div class="match-item">
+                    <div class="match-info">
+                        <div class="match-result lose">失败</div>
+                        <div class="match-details">护送模式 • 3小时前</div>
+                    </div>
+                    <div class="match-score">
+                        <div class="score">1890</div>
+                        <div class="kda">8/7/5</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 页面跳转函数
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        // 添加点击事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 通知按钮
+            document.querySelector('.notification-btn').addEventListener('click', function() {
+                navigateTo('消息页.html');
+            });
+            
+            // 查看详情链接
+            document.querySelector('.view-detail').addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战绩详情页.html');
+            });
+            
+            // 快捷操作按钮
+            const actionBtns = document.querySelectorAll('.action-btn');
+            actionBtns[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('商城页.html');
+            });
+            actionBtns[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('预约页.html');
+            });
+            actionBtns[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战队页.html');
+            });
+            actionBtns[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战绩详情页.html');
+            });
+            
+            // 最近战斗项目点击
+            document.querySelectorAll('.match-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    navigateTo('战绩详情页.html');
+                });
+            });
+            
+            // 底部导航
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战绩详情页.html');
+            });
+            navItems[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战队页.html');
+            });
+            navItems[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('商城页.html');
+            });
+            navItems[4].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('个人中心页.html');
+            });
+        });
+    </script>
+</body>
+</html>

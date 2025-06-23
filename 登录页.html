@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 登录</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .login-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00ffff, #0080ff, #8000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #00ffff;
+            font-size: 14px;
+            margin-bottom: 60px;
+            opacity: 0.8;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+        }
+        
+        .wechat-btn {
+            background: linear-gradient(135deg, #07c160, #00a854);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(7, 193, 96, 0.3);
+        }
+        
+        .wechat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(7, 193, 96, 0.4);
+        }
+        
+        .qr-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            background: url('https://images.unsplash.com/photo-1606166187734-a4cb74c3e723?w=150&h=150&fit=crop') center/cover;
+            margin: 0 auto 15px;
+            border-radius: 10px;
+        }
+        
+        .feature-list {
+            text-align: left;
+            margin-top: 30px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+        
+        .agreement {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+        
+        .agreement a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        
+        .bg-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: float 8s linear infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 背景粒子 -->
+            <div class="bg-particles">
+                <div class="particle" style="left: 15%; animation-delay: 0s;"></div>
+                <div class="particle" style="left: 35%; animation-delay: 2s;"></div>
+                <div class="particle" style="left: 55%; animation-delay: 4s;"></div>
+                <div class="particle" style="left: 75%; animation-delay: 6s;"></div>
+                <div class="particle" style="left: 25%; animation-delay: 1s;"></div>
+                <div class="particle" style="left: 65%; animation-delay: 3s;"></div>
+                <div class="particle" style="left: 85%; animation-delay: 5s;"></div>
+            </div>
+            
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 登录内容 -->
+            <div class="login-container" style="z-index: 10; position: relative;">
+                <div class="logo">星战大联盟</div>
+                <div class="subtitle">STAR WAR ALLIANCE</div>
+                
+                <div class="login-card">
+                    <h2 class="text-white text-xl font-bold mb-6">欢迎加入战场</h2>
+                    
+                    <button class="wechat-btn" onclick="showQR()">
+                        <i class="fab fa-weixin text-xl"></i>
+                        微信扫码登录
+                    </button>
+                    
+                    <div class="qr-container" id="qrContainer">
+                        <div class="qr-code"></div>
+                        <p class="text-gray-600 text-sm">使用微信扫描二维码登录</p>
+                    </div>
+                    
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line text-xs"></i>
+                            </div>
+                            实时战绩统计与分析
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-users text-xs"></i>
+                            </div>
+                            组建专属战队
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-trophy text-xs"></i>
+                            </div>
+                            参与排行榜竞技
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-share-alt text-xs"></i>
+                            </div>
+                            分享精彩战绩
+                        </div>
+                    </div>
+                    
+                    <div class="agreement">
+                        登录即表示同意
+                        <a href="#">《用户协议》</a>
+                        和
+                        <a href="#">《隐私政策》</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showQR() {
+            const qrContainer = document.getElementById('qrContainer');
+            qrContainer.style.display = qrContainer.style.display === 'block' ? 'none' : 'block';
+            
+            // 模拟登录过程
+            if (qrContainer.style.display === 'block') {
+                setTimeout(function() {
+                    alert('登录成功！');
+                    window.location.href = '首页.html';
+                }, 2000);
+            }
+        }
+        
+        // 添加协议链接点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const agreementLinks = document.querySelectorAll('.agreement a');
+            agreementLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('协议页面功能待开发');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

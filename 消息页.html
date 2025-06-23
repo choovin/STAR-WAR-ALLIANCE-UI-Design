@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 消息</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .new-message-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .search-bar {
+            margin: 0 20px 20px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 12px 20px 12px 45px;
+            color: white;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .filter-tabs {
+            margin: 0 20px 20px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            padding: 5px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        .filter-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .filter-tab.active {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+        }
+        
+        .messages-container {
+            margin: 0 20px 100px;
+        }
+        
+        .message-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .message-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .message-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #00ff00;
+            border: 2px solid #000;
+            border-radius: 50%;
+        }
+        
+        .message-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .sender-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .message-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+        
+        .message-preview {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        
+        .message-type {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .type-icon {
+            color: #00ffff;
+        }
+        
+        .unread-badge {
+            background: linear-gradient(45deg, #ff4444, #ff6666);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .team-badge {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .system-badge {
+            background: linear-gradient(45deg, #ffa500, #ffb347);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .pinned-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #ffd700;
+            font-size: 12px;
+        }
+        
+        .message-card.unread {
+            border-left: 4px solid #00ffff;
+        }
+        
+        .message-card.system {
+            border-left: 4px solid #ffa500;
+        }
+        
+        .message-card.team {
+            border-left: 4px solid #ff6b6b;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            color: #00ffff;
+        }
+        
+        .quick-actions {
+            margin: 0 20px 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .quick-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .quick-icon {
+            color: #00ffff;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .quick-text {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <div style="width: 40px;"></div>
+                <h1 class="header-title">消息</h1>
+                <button class="new-message-btn">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+            
+            <!-- 搜索栏 -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="搜索聊天记录...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <div class="quick-action">
+                    <div class="quick-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="quick-text">群聊</div>
+                </div>
+                <div class="quick-action">
+                    <div class="quick-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div class="quick-text">公告</div>
+                </div>
+                <div class="quick-action">
+                    <div class="quick-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="quick-text">游戏邀请</div>
+                </div>
+            </div>
+            
+            <!-- 筛选标签 -->
+            <div class="filter-tabs">
+                <div class="filter-tab active">全部</div>
+                <div class="filter-tab">未读</div>
+                <div class="filter-tab">战队</div>
+                <div class="filter-tab">系统</div>
+            </div>
+            
+            <!-- 消息列表 -->
+            <div class="messages-container">
+                <!-- 置顶消息 -->
+                <h3 class="section-title">
+                    <i class="fas fa-thumbtack section-icon"></i>
+                    置顶消息
+                </h3>
+                
+                <div class="message-card team">
+                    <div class="pinned-indicator">
+                        <i class="fas fa-thumbtack"></i>
+                    </div>
+                    <div class="message-avatar">队</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">
+                                星际战队
+                                <span class="team-badge">战队群</span>
+                            </div>
+                            <div class="message-time">15:30</div>
+                        </div>
+                        <div class="message-preview">队长: 今晚8点团队训练，大家准时参加</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-users type-icon"></i>
+                                <span>8人群聊</span>
+                            </div>
+                            <div class="unread-badge">3</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 未读消息 -->
+                <h3 class="section-title">
+                    <i class="fas fa-envelope section-icon"></i>
+                    未读消息 (5)
+                </h3>
+                
+                <div class="message-card unread">
+                    <div class="message-avatar">
+                        星
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">星际战士</div>
+                            <div class="message-time">刚刚</div>
+                        </div>
+                        <div class="message-preview">兄弟，一起来一局？我刚解锁了新武器</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-gamepad type-icon"></i>
+                                <span>游戏邀请</span>
+                            </div>
+                            <div class="unread-badge">2</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-card system">
+                    <div class="message-avatar">系</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">
+                                系统消息
+                                <span class="system-badge">官方</span>
+                            </div>
+                            <div class="message-time">10分钟前</div>
+                        </div>
+                        <div class="message-preview">恭喜您获得"神枪手"成就，奖励已发放到账户</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-trophy type-icon"></i>
+                                <span>成就奖励</span>
+                            </div>
+                            <div class="unread-badge">1</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-card unread">
+                    <div class="message-avatar">雷</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">雷霆队长</div>
+                            <div class="message-time">30分钟前</div>
+                        </div>
+                        <div class="message-preview">今天的表现不错，继续保持！</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-comment type-icon"></i>
+                                <span>私聊</span>
+                            </div>
+                            <div class="unread-badge">1</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-card team">
+                    <div class="message-avatar">训</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">
+                                训练营群
+                                <span class="team-badge">训练群</span>
+                            </div>
+                            <div class="message-time">1小时前</div>
+                        </div>
+                        <div class="message-preview">教练: 明天的训练计划已发布，请查看</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-dumbbell type-icon"></i>
+                                <span>训练通知</span>
+                            </div>
+                            <div class="unread-badge">1</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 最近聊天 -->
+                <h3 class="section-title">
+                    <i class="fas fa-clock section-icon"></i>
+                    最近聊天
+                </h3>
+                
+                <div class="message-card">
+                    <div class="message-avatar">影</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">影子刺客</div>
+                            <div class="message-time">2小时前</div>
+                        </div>
+                        <div class="message-preview">好的，下次一起组队</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-comment type-icon"></i>
+                                <span>私聊</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-card">
+                    <div class="message-avatar">神</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">神枪手小李</div>
+                            <div class="message-time">昨天</div>
+                        </div>
+                        <div class="message-preview">那个新地图真的很有挑战性</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-comment type-icon"></i>
+                                <span>私聊</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-card">
+                    <div class="message-avatar">风</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">疾风少年</div>
+                            <div class="message-time">昨天</div>
+                        </div>
+                        <div class="message-preview">明天有空一起练习吗？</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-comment type-icon"></i>
+                                <span>私聊</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-card system">
+                    <div class="message-avatar">商</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">
+                                商城通知
+                                <span class="system-badge">官方</span>
+                            </div>
+                            <div class="message-time">2天前</div>
+                        </div>
+                        <div class="message-preview">您的订单已完成，感谢您的购买</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-shopping-cart type-icon"></i>
+                                <span>订单通知</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-card team">
+                    <div class="message-avatar">联</div>
+                    <div class="message-info">
+                        <div class="message-header">
+                            <div class="sender-name">
+                                联盟大群
+                                <span class="team-badge">联盟群</span>
+                            </div>
+                            <div class="message-time">3天前</div>
+                        </div>
+                        <div class="message-preview">管理员: 周末联赛报名开始了</div>
+                        <div class="message-meta">
+                            <div class="message-type">
+                                <i class="fas fa-trophy type-icon"></i>
+                                <span>赛事通知</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+
+        // 搜索功能
+        document.querySelector('.search-input').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            if (searchTerm) {
+                alert(`搜索消息：${searchTerm}`);
+            }
+        });
+
+        // 快捷操作
+        document.querySelectorAll('.quick-action').forEach(action => {
+            action.addEventListener('click', function() {
+                const actionText = this.querySelector('.quick-text').textContent;
+                alert(`${actionText}功能待开发`);
+            });
+        });
+
+        // 筛选标签
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活跃状态
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                // 添加当前活跃状态
+                this.classList.add('active');
+                
+                const filterType = this.textContent;
+                alert(`筛选${filterType}消息功能待开发`);
+            });
+        });
+
+        // 消息卡片点击
+        document.querySelectorAll('.message-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const senderName = this.querySelector('.sender-name').textContent.trim();
+                const messagePreview = this.querySelector('.message-preview');
+                const preview = messagePreview ? messagePreview.textContent : '点击查看详情';
+                
+                // 移除未读状态
+                this.classList.remove('unread');
+                const unreadBadge = this.querySelector('.unread-badge');
+                if (unreadBadge) {
+                    unreadBadge.style.display = 'none';
+                }
+                
+                alert(`打开与${senderName}的聊天\n最新消息：${preview}`);
+            });
+        });
+
+        // 长按消息卡片（删除、置顶等操作）
+        document.querySelectorAll('.message-card').forEach(card => {
+            let pressTimer;
+            
+            card.addEventListener('mousedown', function() {
+                pressTimer = setTimeout(() => {
+                    const senderName = this.querySelector('.sender-name').textContent.trim();
+                    const isPinned = this.querySelector('.pinned-indicator');
+                    
+                    if (confirm(`对话选项：\n1. ${isPinned ? '取消置顶' : '置顶对话'}\n2. 删除对话\n\n是否继续操作？`)) {
+                        alert(`${senderName}的对话操作功能待开发`);
+                    }
+                }, 800);
+            });
+            
+            card.addEventListener('mouseup', function() {
+                clearTimeout(pressTimer);
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                clearTimeout(pressTimer);
+            });
+        });
+
+        // 底部导航
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const navText = this.querySelector('.nav-text').textContent;
+                
+                switch(navText) {
+                    case '首页':
+                        window.location.href = '首页.html';
+                        break;
+                    case '战绩':
+                        window.location.href = '战绩详情页.html';
+                        break;
+                    case '战队':
+                        window.location.href = '战队页.html';
+                        break;
+                    case '商城':
+                        window.location.href = '商城页.html';
+                        break;
+                    case '我的':
+                        window.location.href = '个人中心页.html';
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

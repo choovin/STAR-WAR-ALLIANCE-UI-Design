@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 我的订单</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .filter-tabs {
+            margin: 0 20px 20px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            padding: 5px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        .filter-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .filter-tab.active {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+        }
+        
+        .orders-container {
+            margin: 0 20px 100px;
+        }
+        
+        .order-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .order-number {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+        
+        .order-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-paid {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+        
+        .status-pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+        
+        .status-used {
+            background: rgba(128, 128, 128, 0.2);
+            color: #808080;
+            border: 1px solid rgba(128, 128, 128, 0.3);
+        }
+        
+        .status-cancelled {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+        
+        .order-items {
+            margin-bottom: 15px;
+        }
+        
+        .order-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .item-image {
+            width: 50px;
+            height: 50px;
+            background: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?w=50&h=50&fit=crop') center/cover;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .item-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .item-price {
+            color: #00ffff;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: right;
+        }
+        
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .order-total {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .total-amount {
+            color: #00ffff;
+            font-size: 18px;
+            font-weight: 900;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+        }
+        
+        .store-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        
+        .store-icon {
+            color: #00ffff;
+            font-size: 14px;
+        }
+        
+        .store-name {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+        
+        .order-time {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .empty-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-desc {
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .empty-btn {
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">我的订单</h1>
+                <div style="width: 40px;"></div>
+            </div>
+            
+            <!-- 筛选标签 -->
+            <div class="filter-tabs">
+                <div class="filter-tab active">全部</div>
+                <div class="filter-tab">待付款</div>
+                <div class="filter-tab">已付款</div>
+                <div class="filter-tab">已使用</div>
+            </div>
+            
+            <!-- 订单列表 -->
+            <div class="orders-container">
+                <!-- 订单1 - 已付款 -->
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-number">订单号：SW202312150001</span>
+                        <span class="order-status status-paid">已付款</span>
+                    </div>
+                    
+                    <div class="store-info">
+                        <i class="fas fa-map-marker-alt store-icon"></i>
+                        <span class="store-name">星战大联盟旗舰店</span>
+                    </div>
+                    
+                    <div class="order-items">
+                        <div class="order-item">
+                            <div class="item-image"></div>
+                            <div class="item-info">
+                                <div class="item-name">双人对战套餐</div>
+                                <div class="item-desc">90分钟双人游戏，含装备租赁</div>
+                            </div>
+                            <div class="item-price">¥128</div>
+                        </div>
+                        
+                        <div class="order-item">
+                            <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1556438064-2d7646166914?w=50&h=50&fit=crop');"></div>
+                            <div class="item-info">
+                                <div class="item-name">月度会员卡</div>
+                                <div class="item-desc">30天无限畅玩，专属特权</div>
+                            </div>
+                            <div class="item-price">¥199</div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-footer">
+                        <div class="order-total">
+                            共2件商品 实付：<span class="total-amount">¥292</span>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-secondary">查看详情</button>
+                            <button class="action-btn btn-primary">立即使用</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-time">下单时间：2023-12-15 14:30</div>
+                </div>
+                
+                <!-- 订单2 - 待付款 -->
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-number">订单号：SW202312140002</span>
+                        <span class="order-status status-pending">待付款</span>
+                    </div>
+                    
+                    <div class="store-info">
+                        <i class="fas fa-map-marker-alt store-icon"></i>
+                        <span class="store-name">星际竞技场</span>
+                    </div>
+                    
+                    <div class="order-items">
+                        <div class="order-item">
+                            <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=50&h=50&fit=crop');"></div>
+                            <div class="item-info">
+                                <div class="item-name">团队竞技套餐</div>
+                                <div class="item-desc">120分钟5v5团队对战</div>
+                            </div>
+                            <div class="item-price">¥298</div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-footer">
+                        <div class="order-total">
+                            共1件商品 应付：<span class="total-amount">¥298</span>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-danger">取消订单</button>
+                            <button class="action-btn btn-primary">立即付款</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-time">下单时间：2023-12-14 16:45</div>
+                </div>
+                
+                <!-- 订单3 - 已使用 -->
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-number">订单号：SW202312130003</span>
+                        <span class="order-status status-used">已使用</span>
+                    </div>
+                    
+                    <div class="store-info">
+                        <i class="fas fa-map-marker-alt store-icon"></i>
+                        <span class="store-name">未来战场体验馆</span>
+                    </div>
+                    
+                    <div class="order-items">
+                        <div class="order-item">
+                            <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=50&h=50&fit=crop');"></div>
+                            <div class="item-info">
+                                <div class="item-name">单人体验套餐</div>
+                                <div class="item-desc">60分钟游戏时长，适合新手体验</div>
+                            </div>
+                            <div class="item-price">¥68</div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-footer">
+                        <div class="order-total">
+                            共1件商品 实付：<span class="total-amount">¥68</span>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-secondary">查看详情</button>
+                            <button class="action-btn btn-secondary">再次购买</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-time">使用时间：2023-12-13 19:20</div>
+                </div>
+                
+                <!-- 订单4 - 已取消 -->
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-number">订单号：SW202312120004</span>
+                        <span class="order-status status-cancelled">已取消</span>
+                    </div>
+                    
+                    <div class="store-info">
+                        <i class="fas fa-map-marker-alt store-icon"></i>
+                        <span class="store-name">星战大联盟旗舰店</span>
+                    </div>
+                    
+                    <div class="order-items">
+                        <div class="order-item">
+                            <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=50&h=50&fit=crop');"></div>
+                            <div class="item-info">
+                                <div class="item-name">团队竞技套餐</div>
+                                <div class="item-desc">120分钟5v5团队对战</div>
+                            </div>
+                            <div class="item-price">¥298</div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-footer">
+                        <div class="order-total">
+                            共1件商品 金额：<span class="total-amount">¥298</span>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-secondary">查看详情</button>
+                            <button class="action-btn btn-primary">重新下单</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-time">取消时间：2023-12-12 10:15</div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+
+        // 筛选标签
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活跃状态
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                // 添加当前活跃状态
+                this.classList.add('active');
+                
+                const filterType = this.textContent;
+                alert(`筛选${filterType}订单功能待开发`);
+            });
+        });
+
+        // 订单卡片点击
+        document.querySelectorAll('.order-card').forEach(card => {
+            // 订单号点击
+            card.querySelector('.order-number').addEventListener('click', function(e) {
+                e.stopPropagation();
+                const orderNumber = this.textContent;
+                alert(`复制${orderNumber}到剪贴板`);
+            });
+
+            // 门店信息点击
+            card.querySelector('.store-info').addEventListener('click', function(e) {
+                e.stopPropagation();
+                const storeName = this.querySelector('.store-name').textContent;
+                alert(`查看${storeName}详细信息`);
+            });
+
+            // 商品项点击
+            card.querySelectorAll('.order-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const itemName = this.querySelector('.item-name').textContent;
+                    alert(`查看${itemName}详细信息`);
+                });
+            });
+        });
+
+        // 订单操作按钮
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const btnText = this.textContent;
+                const orderCard = this.closest('.order-card');
+                const orderNumber = orderCard.querySelector('.order-number').textContent;
+                const orderStatus = orderCard.querySelector('.order-status').textContent;
+                
+                switch(btnText) {
+                    case '查看详情':
+                        alert(`查看${orderNumber}详细信息功能待开发`);
+                        break;
+                    case '立即使用':
+                        alert(`使用${orderNumber}中的商品功能待开发`);
+                        break;
+                    case '立即付款':
+                        window.location.href = '支付页.html';
+                        break;
+                    case '取消订单':
+                        if (confirm(`确认取消${orderNumber}吗？`)) {
+                            alert('订单取消成功');
+                            // 更新订单状态
+                            orderCard.querySelector('.order-status').textContent = '已取消';
+                            orderCard.querySelector('.order-status').className = 'order-status status-cancelled';
+                        }
+                        break;
+                    case '确认收货':
+                        if (confirm(`确认收货${orderNumber}吗？`)) {
+                            alert('确认收货成功');
+                            // 更新订单状态
+                            orderCard.querySelector('.order-status').textContent = '已完成';
+                            orderCard.querySelector('.order-status').className = 'order-status status-completed';
+                        }
+                        break;
+                    case '申请退款':
+                        alert(`申请退款${orderNumber}功能待开发`);
+                        break;
+                    case '重新下单':
+                        if (confirm('确认重新下单吗？')) {
+                            alert('重新下单功能待开发');
+                        }
+                        break;
+                    case '评价':
+                        alert(`评价${orderNumber}功能待开发`);
+                        break;
+                    default:
+                        alert(`${btnText}功能待开发`);
+                }
+            });
+        });
+
+        // 订单状态点击
+        document.querySelectorAll('.order-status').forEach(status => {
+            status.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const statusText = this.textContent;
+                const orderNumber = this.closest('.order-card').querySelector('.order-number').textContent;
+                
+                switch(statusText) {
+                    case '待付款':
+                        alert(`${orderNumber}等待付款，请尽快完成支付`);
+                        break;
+                    case '待发货':
+                        alert(`${orderNumber}正在准备发货`);
+                        break;
+                    case '待收货':
+                        alert(`${orderNumber}正在配送中`);
+                        break;
+                    case '已完成':
+                        alert(`${orderNumber}已完成，感谢您的使用`);
+                        break;
+                    case '已取消':
+                        alert(`${orderNumber}已取消`);
+                        break;
+                    default:
+                        alert(`订单状态：${statusText}`);
+                }
+            });
+        });
+
+        // 底部导航
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const navText = this.querySelector('.nav-text').textContent;
+                
+                switch(navText) {
+                    case '首页':
+                        window.location.href = '首页.html';
+                        break;
+                    case '战绩':
+                        window.location.href = '战绩详情页.html';
+                        break;
+                    case '战队':
+                        window.location.href = '战队页.html';
+                        break;
+                    case '商城':
+                        window.location.href = '商城页.html';
+                        break;
+                    case '我的':
+                        window.location.href = '个人中心页.html';
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

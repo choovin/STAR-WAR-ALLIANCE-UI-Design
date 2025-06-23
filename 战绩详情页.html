@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星战大联盟 - 战绩详情</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: transparent;
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+        
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .stats-overview {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .overview-item {
+            text-align: center;
+        }
+        
+        .overview-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00ffff;
+            margin-bottom: 5px;
+        }
+        
+        .overview-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .rank-info {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.1), rgba(0, 128, 255, 0.1));
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .rank-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .rank-value {
+            color: #00ffff;
+            font-size: 14px;
+        }
+        
+        .chart-section {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            height: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffff, #0080ff, #8000ff);
+            animation: chartGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes chartGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); }
+        }
+        
+        .radar-chart {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><polygon points="100,20 170,65 170,135 100,180 30,135 30,65" fill="none" stroke="%2300ffff" stroke-width="1" opacity="0.3"/><polygon points="100,40 150,75 150,125 100,160 50,125 50,75" fill="none" stroke="%2300ffff" stroke-width="1" opacity="0.5"/><polygon points="100,60 130,85 130,115 100,140 70,115 70,85" fill="rgba(0,255,255,0.1)" stroke="%2300ffff" stroke-width="2"/></svg>') center/contain no-repeat;
+        }
+        
+        .skill-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .skill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .skill-name {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        
+        .skill-value {
+            color: #00ffff;
+            font-weight: 700;
+        }
+        
+        .achievements {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .achievement-item {
+            text-align: center;
+        }
+        
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .achievement-name {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .recent-matches {
+            margin: 0 20px 100px;
+        }
+        
+        .match-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .match-result {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .match-result.win {
+            color: #00ff88;
+        }
+        
+        .match-result.lose {
+            color: #ff4444;
+        }
+        
+        .match-time {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .match-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+        }
+        
+        .detail-item {
+            font-size: 12px;
+        }
+        
+        .detail-value {
+            color: #00ffff;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        
+        .detail-label {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            height: 80px;
+            background: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #00ffff;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup mx-auto">
+        <div class="screen">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-three-quarters text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 头部 -->
+            <div class="header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">战绩详情</h1>
+                <button class="share-btn">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
+            
+            <!-- 战绩总览 -->
+            <div class="stats-overview">
+                <div class="overview-grid">
+                    <div class="overview-item">
+                        <div class="overview-value">156</div>
+                        <div class="overview-label">总场次</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">68%</div>
+                        <div class="overview-label">胜率</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">2.8</div>
+                        <div class="overview-label">K/D比</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">1,248</div>
+                        <div class="overview-label">总击杀</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">445</div>
+                        <div class="overview-label">总死亡</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">892</div>
+                        <div class="overview-label">助攻</div>
+                    </div>
+                </div>
+                
+                <div class="rank-info">
+                    <div class="rank-title">当前排名</div>
+                    <div class="rank-value">全服第 1,247 名 • 钻石段位</div>
+                </div>
+            </div>
+            
+            <!-- 战绩趋势图 -->
+            <div class="chart-section">
+                <h3 class="section-title">战绩趋势</h3>
+                <div class="chart-container">
+                    <div class="chart-line" style="height: 60%; animation-delay: 0s;"></div>
+                    <div class="chart-line" style="height: 80%; left: 20%; animation-delay: 0.5s;"></div>
+                    <div class="chart-line" style="height: 45%; left: 40%; animation-delay: 1s;"></div>
+                    <div class="chart-line" style="height: 90%; left: 60%; animation-delay: 1.5s;"></div>
+                    <div class="chart-line" style="height: 75%; left: 80%; animation-delay: 2s;"></div>
+                </div>
+            </div>
+            
+            <!-- 技能雷达图 -->
+            <div class="chart-section">
+                <h3 class="section-title">技能分析</h3>
+                <div class="radar-chart"></div>
+                <div class="skill-stats">
+                    <div class="skill-item">
+                        <span class="skill-name">射击精度</span>
+                        <span class="skill-value">85%</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">反应速度</span>
+                        <span class="skill-value">92%</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">战术意识</span>
+                        <span class="skill-value">78%</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">团队配合</span>
+                        <span class="skill-value">88%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 成就展示 -->
+            <div class="achievements">
+                <h3 class="section-title">最新成就</h3>
+                <div class="achievement-grid">
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="achievement-name">王者归来</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="achievement-name">连胜达人</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="achievement-name">神枪手</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="achievement-name">守护者</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 最近战斗 -->
+            <div class="recent-matches">
+                <h3 class="section-title">最近战斗</h3>
+                
+                <div class="match-item">
+                    <div class="match-header">
+                        <div class="match-result win">胜利</div>
+                        <div class="match-time">2分钟前</div>
+                    </div>
+                    <div class="match-details">
+                        <div class="detail-item">
+                            <div class="detail-value">15</div>
+                            <div class="detail-label">击杀</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value">3</div>
+                            <div class="detail-label">死亡</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value">8</div>
+                            <div class="detail-label">助攻</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="match-item">
+                    <div class="match-header">
+                        <div class="match-result win">胜利</div>
+                        <div class="match-time">1小时前</div>
+                    </div>
+                    <div class="match-details">
+                        <div class="detail-item">
+                            <div class="detail-value">18</div>
+                            <div class="detail-label">击杀</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value">2</div>
+                            <div class="detail-label">死亡</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value">12</div>
+                            <div class="detail-label">助攻</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="match-item">
+                    <div class="match-header">
+                        <div class="match-result lose">失败</div>
+                        <div class="match-time">3小时前</div>
+                    </div>
+                    <div class="match-details">
+                        <div class="detail-item">
+                            <div class="detail-value">8</div>
+                            <div class="detail-label">击杀</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value">7</div>
+                            <div class="detail-label">死亡</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value">5</div>
+                            <div class="detail-label">助攻</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </a>
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">战绩</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">战队</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="nav-text">商城</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 页面跳转函数
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        // 添加点击事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮
+            document.querySelector('.back-btn').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 分享按钮
+            document.querySelector('.share-btn').addEventListener('click', function() {
+                navigateTo('分享页.html');
+            });
+            
+            // 战绩项目点击
+            document.querySelectorAll('.match-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    alert('查看详细战斗回放功能待开发');
+                });
+            });
+            
+            // 底部导航
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('首页.html');
+            });
+            navItems[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('战队页.html');
+            });
+            navItems[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('商城页.html');
+            });
+            navItems[4].addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo('个人中心页.html');
+            });
+        });
+    </script>
+</body>
+</html>
